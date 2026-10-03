@@ -16,7 +16,7 @@ export default function build() {
   const FL = 11; // floor level of the shrine
   // inscription plaque on the front of the lowest step
   B.add(chamferBox(26, 2.6, 1.0, 0.3), { p: [0, 2.0, 30.1] }, 'plaque');
-  for (const [w, y] of [[20, 2.6], [14, 1.4]]) B.add(box(w, 0.6, 0.7), { p: [0, y, 30.6] }, 'plaquetext');
+  for (const [w, y] of [[20, 2.75], [14, 1.3]]) B.add(box(w, 0.8, 0.8), { p: [0, y, 30.6] }, 'plaquetext');
   // corner studs on the middle step
   for (const sx of [-1, 1]) B.add(lathe([[1.8, 0], [1.6, 0.8], [0.9, 1.6], [0, 2.0]], 8), { p: [sx * 23.5, 8, 19.5] }, 'stud');
 

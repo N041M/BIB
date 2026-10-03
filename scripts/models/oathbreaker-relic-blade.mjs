@@ -17,7 +17,7 @@ export default function build() {
     B.group({ r: [0, a, 0] }, () => {
       const apo = 27 * Math.cos(Math.PI / 6);
       B.add(chamferBox(16, 1.6, 1.2, 0.3), { p: [0, 1.3, apo - 0.2] }, 'plaque');
-      B.add(box(11, 0.5, 0.6), { p: [0, 1.3, apo + 0.5] }, 'plaquetext');
+      B.add(box(11, 0.8, 0.8), { p: [0, 1.3, apo + 0.5] }, 'plaquetext');
     });
   }
   const BASE_TOP = 5.2;

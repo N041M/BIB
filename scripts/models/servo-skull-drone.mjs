@@ -10,11 +10,11 @@ export default function build() {
   const rng = B.rng;
 
   // ------------------------------------------------------------ flight-stand base
-  B.add(lathe([[17, 0], [17, 1.8], [16.2, 2.8], [14.6, 3.6], [13.4, 3.9]], 36), {}, 'base');
-  B.add(latheLoop([[10.5, 3.5], [11.6, 3.5], [11.6, 4.2], [10.5, 4.2]], 36), {}, 'basering');
+  B.add(lathe([[19, 0], [19, 1.8], [18.2, 2.8], [16.4, 3.6], [15.0, 3.9]], 40), {}, 'base');
+  B.add(latheLoop([[12.0, 3.5], [13.2, 3.5], [13.2, 4.3], [12.0, 4.3]], 40), {}, 'basering');
   // little scatter of rubble and a spent cog on the base
   for (let i = 0; i < 6; i++) {
-    const a = rng.range(0, Math.PI * 2), r = rng.range(5.5, 12);
+    const a = rng.range(0, Math.PI * 2), r = rng.range(5.5, 14);
     const s = rng.range(0.9, 1.7);
     const pts = [];
     for (let k = 0; k < 8; k++) pts.push([rng.range(-1, 1) * s, rng.range(0, 1) * s, rng.range(-1, 1) * s]);

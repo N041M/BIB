@@ -72,7 +72,7 @@ export default function build() {
       // pressure gauge above each valve
       B.add(cyl(2.4, 2.4, 1.4, 14), { p: [sx * 9.2, FL + 15.6, FZ + 0.4], r: [90, 0, 0] }, 'gauge');
       B.add(latheLoop([[1.8, 0], [2.6, 0], [2.6, 0.8], [1.8, 0.8]], 14), { p: [sx * 9.2, FL + 15.6, FZ + 0.9], r: [90, 0, 0] }, 'gauge');
-      B.add(box(0.7, 1.8, 0.5), { p: [sx * 9.2 + 0.3, FL + 16.2, FZ + 1.3], r: [0, 0, sx * 35] }, 'needle');
+      B.add(box(0.8, 1.8, 0.8), { p: [sx * 9.2 + 0.3, FL + 16.2, FZ + 1.3], r: [0, 0, sx * 35] }, 'needle');
     }
   }
   // side panels on the cabinet: vents

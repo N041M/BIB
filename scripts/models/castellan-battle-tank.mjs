@@ -66,8 +66,8 @@ export default function build() {
     // raised lower lip strip
     B.add(chamferBox(66, 1.6, 1.2, 0.35), { p: [-1, 15.6, FACE + 3.0] }, 'skirtstrip');
     B.add(chamferBox(66, 1.4, 1.2, 0.35), { p: [-1, 26.8, FACE + 3.0] }, 'skirtstrip');
-    rivetLine(B, [-33, 15.6, FACE + 3.6], [30, 15.6, FACE + 3.6], 9, [0, 0, 1], 0.6);
-    rivetLine(B, [-33, 26.8, FACE + 3.6], [30, 26.8, FACE + 3.6], 9, [0, 0, 1], 0.6);
+    rivetLine(B, [-33, 15.6, FACE + 3.6], [30, 15.6, FACE + 3.6], 8, [0, 0, 1], 0.6);
+    rivetLine(B, [-33, 26.8, FACE + 3.6], [30, 26.8, FACE + 3.6], 8, [0, 0, 1], 0.6);
     // pointed-arch hatch plate
     const arch = gothicArchPts(10, 2.5, 10, 6, 0, 0);
     B.add(extrude(arch, 1.6, { bevel: 0.45 }), { p: [-2, 17.0, FACE + 2.6] }, 'hatch');
@@ -103,7 +103,7 @@ export default function build() {
   B.mirrorZ(() => {
     B.add(chamferBox(66, 1.2, 1.4, 0.35), { p: [-11, 33.4, 22.6] }, 'deckedge');
     rivetLine(B, [-42, 33.9, 22.6], [20, 33.9, 22.6], 10, [0, 1, 0], 0.55);
-    rivetLine(B, [-44, 27.0, 25.9], [34, 27.0, 25.9], 11, [0, 0.4, 1], 0.6);
+    rivetLine(B, [-44, 27.0, 25.9], [34, 27.0, 25.9], 9, [0, 0.4, 1], 0.6);
   });
 
   // front lower plate: hull gun in ball mount + headlights + skull
@@ -146,7 +146,7 @@ export default function build() {
   B.add(box(1.0, 6.0, 8.2), { p: [-25.5, 36.2, 16.5] }, 'strap');
   B.add(box(1.0, 6.0, 8.2), { p: [-20.5, 36.2, 16.5] }, 'strap');
   B.add(lathe([[3.0, 0], [3.2, 0.3], [3.2, 9.4], [3.0, 9.7]], 14), { p: [-23, 36.6, -16.5], r: [90, 0, 90] }, 'drum');
-  for (const x of [-26, -20]) B.add(torus(3.2, 0.45, 5, 14), { p: [x, 36.6, -16.5], r: [0, 90, 0] }, 'drumrib');
+  for (const x of [-26, -20]) B.add(torus(3.2, 0.5, 4, 12), { p: [x, 36.6, -16.5], r: [0, 90, 0] }, 'drumrib');
 
   // ------------------------------------------------------------------ turret
   B.group({ p: [-5, 33.5, 0] }, () => {

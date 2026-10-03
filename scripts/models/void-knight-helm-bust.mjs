@@ -10,14 +10,15 @@ export default function build() {
 
   // ------------------------------------------------------------ turned plinth
   B.add(lathe([
-    [21.8, 0], [21.8, 2.0], [20.6, 2.8], [20.6, 4.0], [19.0, 5.0], [17.0, 5.6], [16.2, 7.0], [16.2, 13.0],
-    [17.0, 14.0], [18.8, 14.8], [18.8, 17.2], [17.8, 18.0],
+    [21.8, 0], [21.8, 2.0], [20.6, 2.8], [20.6, 4.0], [19.0, 5.0], [17.0, 5.6], [16.2, 7.0], [16.2, 16.0],
+    [17.0, 17.0], [18.8, 17.8], [18.8, 20.2], [17.8, 21.0],
   ], 36), {}, 'plinth');
-  B.add(latheLoop([[15.9, 9.2], [16.9, 9.4], [16.9, 10.6], [15.9, 10.8]], 36), {}, 'plinthring');
+  B.add(latheLoop([[15.9, 8.2], [16.9, 8.4], [16.9, 9.6], [15.9, 9.8]], 36), {}, 'plinthring');
+  B.add(latheLoop([[15.9, 13.6], [16.9, 13.8], [16.9, 15.0], [15.9, 15.2]], 36), {}, 'plinthring');
   // name plate on the plinth front
-  B.add(chamferBox(15, 4.2, 2.2, 0.5), { p: [0, 10.0, 16.0] }, 'nameplate');
-  for (const [w, y] of [[11, 10.9], [7, 9.1]]) B.add(box(w, 0.7, 0.7), { p: [0, y, 17.2] }, 'nametext');
-  const PT = 18.0;
+  B.add(chamferBox(15, 3.4, 2.2, 0.5), { p: [0, 11.7, 16.0] }, 'nameplate');
+  for (const [w, y] of [[11, 12.4], [7, 10.9]]) B.add(box(w, 0.85, 0.8), { p: [0, y, 17.2] }, 'nametext');
+  const PT = 21.0;
 
   // ------------------------------------------------------------ torso & breastplate
   const ringPts = (y, rx, rz, front = 0, n = 14) => {
@@ -72,8 +73,8 @@ export default function build() {
   B.mirrorX(() => {
     const dir = V(0.68, 0.73, 0).normalize();
     const q = qAlignY(dir);
-    const c = V(14.6, PT + 23.6, -0.5);
-    B.group({ p: [c.x, c.y, c.z], q }, () => {
+    const c = V(14.4, PT + 23.0, -0.5);
+    B.group({ p: [c.x, c.y, c.z], q, s: 0.92 }, () => {
       B.add(lathe([[12.0, -1.0], [12.0, 0.4], [11.2, 3.2], [9.6, 6.0], [7.0, 8.4], [3.8, 9.8], [0, 10.3]], 28), { s: [1, 1, 1.12] }, 'pauldron');
       B.add(latheLoop([[11.2, -1.8], [13.6, -1.8], [13.6, 0.0], [12.7, 1.2], [11.4, 1.2]], 28), { s: [1, 1, 1.12] }, 'pauldronrim');
       // rivets on the rim
@@ -91,12 +92,17 @@ export default function build() {
     // armoured bicep band
     B.add(latheLoop([[5.4, 0], [6.3, 0], [6.3, 1.8], [5.4, 1.8]], 16), { p: [17.6, PT + 14.2, -0.5], r: [0, 0, 8] }, 'armband');
   });
-  // purity seal on the left pauldron
+  // purity seal on the front of the left pauldron
   {
-    const p = V(-24.6, PT + 31.4, 6.4);
-    B.add(lathe([[3.0, 0], [3.2, 0.5], [2.6, 1.2], [0, 1.4]], 14), { p: [p.x, p.y, p.z], q: qAlignY(V(-0.55, 0.45, 0.7)) }, 'seal');
-    for (const [dx, len] of [[-1.0, 9], [1.2, 7]]) {
-      B.add(chamferBox(1.9, len, 0.9, 0.2), { p: [p.x + 0.8 + dx * 0.6, p.y - 1.5 - len / 2, p.z + 1.4], r: [10, 30, 6] }, 'sealribbon');
+    const q = qAlignY(V(0.68, 0.73, 0));
+    const toWorld = (v) => v.multiplyScalar(0.92).applyQuaternion(q).add(V(14.4, PT + 23.0, -0.5));
+    const p = toWorld(V(0, 4.6, 10.2 * 1.12));
+    const n = V(0, 4.6, 10.2 * 1.12).applyQuaternion(q).normalize();
+    p.x = -p.x;
+    n.x = -n.x;
+    B.add(lathe([[3.0, -0.6], [3.2, 0.5], [2.6, 1.2], [0, 1.4]], 14), { p: [p.x, p.y, p.z], q: qAlignY(n) }, 'seal');
+    for (const [dx, len] of [[-1.1, 9], [1.2, 7]]) {
+      B.add(chamferBox(1.9, len, 0.9, 0.2), { p: [p.x + dx, p.y - 1.2 - len / 2, p.z + 0.9], r: [-8, 0, dx * 3] }, 'sealribbon');
     }
   }
 
@@ -104,7 +110,7 @@ export default function build() {
   const HY = PT + 30.5; // helm base (chin) level
   B.group({ p: [0, HY, -0.6] }, () => {
     // cranium dome
-    const dome = lathe([[8.4, 0], [9.8, 2.4], [10.6, 6.5], [10.8, 10.5], [10.2, 14.5], [8.8, 17.8], [6.3, 20.4], [3.4, 21.8], [0, 22.3]], 28);
+    const dome = lathe([[8.6, 0], [10.2, 2.4], [11.1, 6.0], [11.3, 9.8], [10.8, 13.6], [9.4, 16.8], [7.0, 19.4], [3.8, 20.9], [0, 21.4]], 28);
     deform(dome, (v) => {
       v.z *= 1.12;
     });
@@ -157,12 +163,12 @@ export default function build() {
     const crestPts = [];
     for (let i = 0; i <= 12; i++) {
       const a = 0.2 * Math.PI - (i / 12) * 0.9 * Math.PI;
-      crestPts.push([Math.sin(a) * 10.0 * 1.12, 11.4 + Math.cos(a) * 10.6]);
+      crestPts.push([Math.sin(a) * 10.0 * 1.12, 10.6 + Math.cos(a) * 10.6]);
     }
     for (let i = 12; i >= 0; i--) {
       const a = 0.2 * Math.PI - (i / 12) * 0.9 * Math.PI;
       const h = 4.0 - 1.8 * (i / 12);
-      crestPts.push([Math.sin(a) * (10.0 * 1.12 + h * 0.6), 11.4 + Math.cos(a) * (10.6 + h)]);
+      crestPts.push([Math.sin(a) * (10.0 * 1.12 + h * 0.6), 10.6 + Math.cos(a) * (10.6 + h)]);
     }
     const outline = crestPts.map(([z, y]) => [-z, y]).reverse();
     B.add(extrude(outline, 3.0, { bevel: 0.5, center: true }), { r: [0, 90, 0] }, 'crest');

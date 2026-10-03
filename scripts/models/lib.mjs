@@ -548,15 +548,20 @@ export function addSkull(B, size, t = {}) {
     ]), {}, 'skull');
     // brow ridge
     B.add(chamferBox(6.8 * s, 1.0 * s, 1.2 * s, 0.35 * s), { p: [0, 6.0 * s, 3.1 * s], r: [-12, 0, 0] }, 'skull');
-    // eye socket rims (rings) + nose
+    // eye socket rims (rings) + nose; ring/teeth sizes are clamped so tiny
+    // skulls never get sub-0.8 mm slivers
+    const tr = Math.max(0.38 * s, 0.42);
     for (const sx of [-1, 1]) {
-      const rg = torus(1.0 * s, 0.38 * s, 5, 10);
+      const rg = torus(Math.max(1.0 * s, tr * 1.6), tr, 5, 10);
       B.add(rg, { p: [sx * 1.5 * s, 4.8 * s, 3.05 * s], r: [-10, 0, 0] }, 'skull');
     }
     B.add(hull([[0, 3.95 * s, 3.25 * s], [-0.65 * s, 2.85 * s, 3.05 * s], [0.65 * s, 2.85 * s, 3.05 * s], [0, 3.4 * s, 2.3 * s]]), {}, 'skull');
-    // teeth
-    for (let i = -2; i <= 2; i++) {
-      B.add(box(0.75 * s, 1.0 * s, 0.6 * s), { p: [i * 0.9 * s, 1.9 * s, 2.55 * s - Math.abs(i) * 0.2 * s] }, 'skull');
+    // teeth (fewer, chunkier on small skulls)
+    const nT = size >= 7 ? 2 : 1;
+    const step = (4.5 * s) / (2 * nT + 1);
+    const tw = Math.max(step * 0.82, 0.8);
+    for (let i = -nT; i <= nT; i++) {
+      B.add(box(tw, Math.max(1.0 * s, 0.8), Math.max(0.6 * s, 0.8)), { p: [i * step, 1.9 * s, 2.55 * s - Math.abs(i) * (0.4 / nT) * s] }, 'skull');
     }
   });
 }
