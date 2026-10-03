@@ -1,68 +1,67 @@
-import { BRAND, LICENCES } from '../config';
+import { BRAND, LICENCES, type LicenceId } from '../config';
 import { CATEGORIES, PRODUCTS, type CategoryId, type Product } from '../data/catalog';
-import { esc, fromHTML, qs, qsa } from '../lib/dom';
-import { archiveDate, clock, formatMoney, pad } from '../lib/format';
-import { close } from '../lib/glyphs';
-import { settle, typewrite } from '../lib/scramble';
+import { esc, fromHTML, qs, qsa, replayClass } from '../lib/dom';
+import { archiveDate, clock, formatMoney, formatPrice, pad } from '../lib/format';
 import type { Sequence } from '../lib/sequence';
 import { cart } from '../state/cart';
-import { loadModel } from '../three/models';
 import type { SharedRenderer } from '../three/renderer';
 import { ProductCard } from './card';
+import type { TabId } from './page';
+
+export const TABS: { id: TabId; label: string }[] = [
+  { id: 'archive', label: 'ARCHIVE' },
+  { id: 'licences', label: 'LICENCES' },
+  { id: 'printing', label: 'PRINTING' },
+  { id: 'faq', label: 'FAQ' },
+];
 
 export interface StoreCallbacks {
   onInspect: (product: Product) => void;
   onOpenCart: () => void;
-  onPowerDown: () => void;
+  onRestart: () => void;
+  onExit: () => void;
 }
 
 type Filter = CategoryId | 'all';
 
-type LogRow =
-  | { kind: 'head' | 'hot'; text: string }
-  | { kind: 'line'; cmd: string; res: string; awaits?: 'models' }
-  | { kind: 'gap' };
+const FAQ: [string, string][] = [
+  ['What scale are the models?', 'Most models are sized for 28–32 mm tabletop games. Busts and display relics list their own size. STL files scale freely in any slicer.'],
+  ['Do the files come pre-supported?', 'Most do. Each pattern lists whether supports are included, and every ZIP has both supported and unsupported files.'],
+  ['Can I sell prints?', 'Yes, with a merchant licence. It covers up to 250 physical prints of a model per month. Reselling or sharing the files themselves is never allowed.'],
+  ['Is there a free model to try?', 'Yes. The Servo-Skull Drone is free, so you can test our supports on your own printer before you buy.'],
+  ['How do I get the files?', 'The order page links a ZIP for each pattern. Updates to a model are free for as long as it stays in the archive.'],
+];
 
-/** Width the dotted leaders pad each command to, in characters. */
-const LEADER = 30;
+const PRINTING: [string, string][] = [
+  ['FILES', 'ZIP with supported and unsupported STL, slicer profiles and a part map'],
+  ['TESTED ON', 'Resin and FDM printers before release'],
+  ['LAYER HEIGHT', '0.03–0.05 mm on resin, 0.12 mm on FDM'],
+  ['SLICERS', 'Chitubox, Lychee, PrusaSlicer, Cura, Bambu Studio'],
+  ['SCALE', '28–32 mm unless the pattern says otherwise'],
+  ['UNITS', 'Millimetres, Z-up, resting on the build plate'],
+  ['UPDATES', 'Free for as long as the model is in the archive'],
+];
 
-/** `> MOUNT /DEV/ARCHIVE ............ OK` */
-function logLine(cmd: string, res: string): string {
-  return `> ${cmd} ${'.'.repeat(Math.max(3, LEADER - cmd.length))} ${res}`;
-}
+const leaders = (rows: [string, string][]) =>
+  rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
 
-function bootLog(): LogRow[] {
-  return [
-    { kind: 'head', text: `${BRAND.terminalName} // COGITATOR ${BRAND.nodeId}` },
-    { kind: 'head', text: '++ PRAISE THE FORGE ++' },
-    { kind: 'gap' },
-    { kind: 'line', cmd: 'MOUNT /DEV/PATTERN-ARCHIVE', res: 'OK' },
-    { kind: 'line', cmd: 'INDEX PATTERNS', res: `${pad(PRODUCTS.length)} ON FILE` },
-    { kind: 'line', cmd: 'VERIFY LICENCE SEALS', res: 'SANCTIONED' },
-    { kind: 'line', cmd: 'LOAD HOLO-PLINTHS', res: 'OK', awaits: 'models' },
-    { kind: 'line', cmd: 'SYNC VOX-CHANNEL 01', res: 'LIVE' },
-    { kind: 'line', cmd: 'CHRONOMETRY', res: archiveDate() },
-    { kind: 'gap' },
-    { kind: 'hot', text: `++ LINK ESTABLISHED: ${BRAND.domain.toUpperCase()} ++` },
-  ];
-}
-
-/** The longest the boot log will wait on slow model downloads before printing OK anyway. */
-const MODEL_WAIT_MS = 4500;
-
-/** The cogitator storefront: the clear terminal the HUD resolves into. */
+/** The storefront as a terminal program: title bar, section tabs, the archive grid and a status line. */
 export class Store {
   readonly el: HTMLElement;
+  /** The area between the tabs and the status line. The inspector and the drawer open over it. */
+  readonly body: HTMLElement;
   readonly cards: ProductCard[];
+  private scroller: HTMLElement;
   private clockTimer = 0;
-  private texts = new Map<HTMLElement, string>();
-  private log: HTMLElement;
-  private logTimer = 0;
+  private tab: TabId = 'archive';
 
   constructor(renderer: SharedRenderer, cb: StoreCallbacks) {
     this.el = fromHTML(this.template());
-    this.log = qs(this.el, '.term-log');
-    const grid = qs(this.el, '.term-grid');
+    this.body = qs(this.el, '.tui__body');
+    this.scroller = qs(this.el, '.tui__scroll');
+    this.body.prepend(renderer.canvas);
+
+    const grid = qs(this.el, '.grid');
     this.cards = PRODUCTS.map(
       (p) =>
         new ProductCard(p, renderer, {
@@ -75,233 +74,172 @@ export class Store {
     );
     this.cards.forEach((c) => grid.append(c.el));
 
-    qsa(this.el, '[data-typed]').forEach((el) => this.texts.set(el, el.dataset.typed || ''));
-
-    qsa<HTMLButtonElement>(this.el, '.term-filter').forEach((btn) =>
-      btn.addEventListener('click', () => this.setFilter(btn.dataset.filter as Filter)),
-    );
+    qsa(this.el, '[data-tab]').forEach((btn) => btn.addEventListener('click', () => this.setTab(btn.dataset.tab as TabId, true)));
+    qsa(this.el, '.filter').forEach((btn) => btn.addEventListener('click', () => this.setFilter(btn.dataset.filter as Filter)));
     qsa(this.el, '[data-action="cart"]').forEach((b) => b.addEventListener('click', () => cb.onOpenCart()));
-    qs(this.el, '[data-action="power"]').addEventListener('click', () => cb.onPowerDown());
+    qs(this.el, '[data-action="restart"]').addEventListener('click', () => cb.onRestart());
+    qs(this.el, '[data-action="exit"]').addEventListener('click', () => cb.onExit());
+    qsa(this.el, '[data-goto]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const product = PRODUCTS.find((p) => p.slug === b.dataset.goto);
+        if (product) cb.onInspect(product);
+      }),
+    );
 
     cart.subscribe(() => this.syncCart());
     this.syncCart();
   }
 
-  /** Called once the terminal is on screen. */
+  /** The screen is on and in view. */
   activate(): void {
-    this.tickClock();
+    this.tick();
     window.clearInterval(this.clockTimer);
-    this.clockTimer = window.setInterval(() => this.tickClock(), 1000);
+    this.clockTimer = window.setInterval(() => this.tick(), 1000);
   }
 
   deactivate(): void {
     window.clearInterval(this.clockTimer);
-    this.cards.forEach((c) => c.setActive(false));
+  }
+
+  setTab(tab: TabId, redraw = false): void {
+    const changed = tab !== this.tab;
+    this.tab = tab;
+    qsa(this.el, '.tui__tab').forEach((btn) => btn.setAttribute('aria-selected', String(btn.dataset.tab === tab)));
+    qsa(this.el, '.tui__panel').forEach((panel) => (panel.hidden = panel.dataset.panel !== tab));
+    if (!changed) return;
+    this.scroller.scrollTop = 0;
+    if (redraw) replayClass(qs(this.el, `[data-panel="${tab}"]`), 'is-redraw');
   }
 
   setRenderingPaused(paused: boolean): void {
     this.cards.forEach((c) => c.setActive(!paused));
   }
 
-  /**
-   * The boot log prints itself over the empty screen (holding on the model
-   * line until every pattern has downloaded), fades away, and the archive
-   * streams in from the top.
-   */
+  /** Cards stream in one after another while the archive is drawn onto the glass. */
   async intro(seq: Sequence): Promise<void> {
-    this.el.classList.add('term--intro');
-    const modelsReady = Promise.all(PRODUCTS.map((p) => loadModel(p.file)));
-    for (const row of qsa(this.log, '.log__row')) {
-      if (seq.skipped) break;
-      row.classList.add('is-in');
-      const text = this.texts.get(row) ?? '';
-      if (!text) {
-        await seq.wait(90);
-        continue;
-      }
-      // headings print fast, command lines a touch slower, like a real log
-      const cps = row.classList.contains('log__row--line') ? 95 : 70;
-      if (row.dataset.awaits === 'models') {
-        const res = row.dataset.res ?? '';
-        const head = text.slice(0, text.length - res.length);
-        await typewrite(row, head, { cps });
-        row.classList.add('is-typing');
-        await Promise.race([modelsReady, seq.wait(MODEL_WAIT_MS)]);
-        row.classList.remove('is-typing');
-        settle(row, text);
-        await seq.wait(120);
-        continue;
-      }
-      void typewrite(row, text, { cps });
-      await seq.wait(Math.min(520, (text.length / cps) * 1000 + 60));
-    }
-    qsa(this.log, '.log__row').forEach((r) => r.classList.add('is-in'));
-    await seq.wait(650);
-
-    // the log has done its job: fade it and let the archive take the screen
-    this.dismissLog();
-    await seq.wait(320);
-
-    const rail = qsa(this.el, '.term-rail [data-intro]');
-    rail.forEach((el, i) => {
-      el.style.animationDelay = `${i * 55}ms`;
-      el.classList.add('is-in');
-    });
-    qsa(this.el, '.term-grid__bar').forEach((el) => el.classList.add('is-in'));
-    await seq.wait(140);
-
-    const visible = this.cards.filter((c) => !c.el.hidden);
-    for (const card of visible) {
+    for (const card of this.cards.filter((c) => !c.el.hidden)) {
       if (seq.skipped) break;
       card.enter(true);
-      await seq.wait(120);
+      await seq.wait(75);
     }
-    qsa(this.el, '.term-status, .term-codex, .term-close').forEach((el) => el.classList.add('is-in'));
-    await seq.wait(400);
-    this.finishIntro();
   }
 
-  /** Return to the pre-intro state so the next wake replays the whole stream-in. */
-  reset(): void {
-    this.el.classList.remove('term--intro', 'term--ready');
-    qsa(this.el, '.is-in').forEach((el) => el.classList.remove('is-in'));
-    qsa(this.log, '.log__row').forEach((el) => (el.textContent = ''));
-    window.clearTimeout(this.logTimer);
-    this.log.hidden = false;
-    this.log.classList.remove('is-done');
-    this.cards.forEach((c) => c.reset());
-  }
-
-  /** Fade the boot log out, then take it out of the page entirely. */
-  private dismissLog(immediate = false): void {
-    window.clearTimeout(this.logTimer);
-    if (immediate) {
-      this.log.classList.add('is-done');
-      this.log.hidden = true;
-      return;
-    }
-    this.log.classList.add('is-done');
-    this.logTimer = window.setTimeout(() => (this.log.hidden = true), 800);
-  }
-
-  /** Snap to the finished state (skip, reduced motion, or direct deep link). */
+  /** Snap to the finished state (end of boot, Skip, reduced motion). */
   finishIntro(): void {
-    if (!this.log.classList.contains('is-done')) this.dismissLog(true);
-    qsa(this.el, '.log__row, .term-grid__bar, .term-status, .term-codex, .term-close, .term-rail [data-intro]').forEach((el) =>
-      el.classList.add('is-in'),
-    );
-    this.texts.forEach((text, el) => {
-      if (el.textContent !== text) settle(el, text);
-    });
     this.cards.forEach((c) => {
       if (!c.el.hidden) c.enter(false);
     });
-    this.el.classList.remove('term--intro');
-    this.el.classList.add('term--ready');
+  }
+
+  /** Back to the pre-boot state so the next power-on streams everything in again. */
+  reset(): void {
+    this.cards.forEach((c) => c.reset());
+    this.scroller.scrollTop = 0;
   }
 
   private setFilter(filter: Filter): void {
-    qsa<HTMLButtonElement>(this.el, '.term-filter').forEach((btn) => {
-      const on = btn.dataset.filter === filter;
-      btn.classList.toggle('is-on', on);
-      btn.setAttribute('aria-pressed', String(on));
-    });
-    this.el.classList.toggle('term--filtered', filter !== 'all');
+    qsa(this.el, '.filter').forEach((btn) => btn.setAttribute('aria-pressed', String(btn.dataset.filter === filter)));
     let shown = 0;
     this.cards.forEach((card) => {
       const visible = filter === 'all' || card.product.category === filter;
       card.setVisible(visible);
       if (!visible) return;
       card.enter(false);
-      card.el.classList.remove('is-refresh');
-      void card.el.offsetWidth;
-      card.el.style.animationDelay = `${shown * 60}ms`;
-      card.el.classList.add('is-refresh');
+      card.el.style.animationDelay = `${shown * 50}ms`;
+      replayClass(card.el, 'is-refresh');
       shown++;
     });
-    settle(qs(this.el, '.term-grid__count'), `> ${pad(shown)} PATTERNS INDEXED`);
+    qs(this.el, '.grid-count').textContent = `${pad(shown)} PATTERNS`;
   }
 
   private syncCart(): void {
-    const n = cart.count;
-    qsa(this.el, '.term-cart-count').forEach((el) => (el.textContent = pad(n)));
-    qsa(this.el, '.term-cart-total').forEach((el) => (el.textContent = formatMoney(cart.total)));
-    qsa(this.el, '.term-status__cart').forEach((el) => el.classList.toggle('has-items', n > 0));
+    qsa(this.el, '.tui__req-n').forEach((el) => (el.textContent = `[${pad(cart.count)}]`));
+    qs(this.el, '.tui__req-total').textContent = formatMoney(cart.total);
+    qsa(this.el, '.tui__req').forEach((el) => el.classList.toggle('has-items', cart.count > 0));
     this.cards.forEach((c) => c.setInCart(cart.licenceOf(c.product.id)));
   }
 
-  private tickClock(): void {
-    qsa(this.el, '.term-clock').forEach((el) => (el.textContent = clock()));
+  private tick(): void {
+    qs(this.el, '.tui-clock').textContent = clock();
   }
 
   private template(): string {
     const counts = new Map<CategoryId, number>();
     PRODUCTS.forEach((p) => counts.set(p.category, (counts.get(p.category) ?? 0) + 1));
     const filter = (id: string, label: string, n: number, on = false) =>
-      `<button type="button" class="term-filter${on ? ' is-on' : ''}" data-filter="${id}" aria-pressed="${on}" data-intro><span>${label}</span><em>${pad(n)}</em></button>`;
-    const filters = [
-      filter('all', 'ALL PATTERNS', PRODUCTS.length, true),
-      ...CATEGORIES.map((c) => filter(c.id, c.label, counts.get(c.id) ?? 0)),
-    ].join('');
-    const log = bootLog()
-      .map((row) => {
-        if (row.kind === 'gap') return '<p class="log__row log__row--gap"></p>';
-        const text = row.kind === 'line' ? logLine(row.cmd, row.res) : row.text;
-        const awaits = row.kind === 'line' && row.awaits ? ` data-awaits="${row.awaits}" data-res="${esc(row.res)}"` : '';
-        return `<p class="log__row log__row--${row.kind}" data-typed="${esc(text)}"${awaits}></p>`;
-      })
-      .join('');
+      `<button type="button" class="filter" data-filter="${id}" aria-pressed="${on}">${label}<em>${pad(n)}</em></button>`;
+    const filters = [filter('all', 'ALL', PRODUCTS.length, true), ...CATEGORIES.map((c) => filter(c.id, c.label, counts.get(c.id) ?? 0))].join('');
+    const tabs = TABS.map(
+      (t, i) =>
+        `<button type="button" role="tab" class="tui__tab" id="tui-tab-${t.id}" data-tab="${t.id}" aria-controls="tui-${t.id}" aria-selected="${i === 0}"><kbd>${i + 1}</kbd>${t.label}</button>`,
+    ).join('');
+
+    const paid = PRODUCTS.filter((p) => p.price.personal > 0);
+    const from = Math.min(...paid.map((p) => p.price.personal));
+    const free = PRODUCTS.find((p) => p.price.personal === 0);
+    const licence = (id: LicenceId, price: string) => {
+      const l = LICENCES[id];
+      return `<article class="doc__box">
+        <h4>${l.terminalLabel}</h4>
+        <p>${esc(l.summary)}</p>
+        <ul>${l.terms.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+        <p class="doc__price">${price}</p>
+      </article>`;
+    };
 
     return /* html */ `
-<div class="term">
-  <h1 class="sr-only">${BRAND.name} pattern archive: licensed STL models</h1>
+<div class="tui">
+  <header class="tui__head">
+    <span class="tui__title">${BRAND.terminalName} <span class="tui__sep">//</span> ${BRAND.terminalSub}</span>
+    <span class="tui__meta"><span class="hide-sm">NODE ${BRAND.nodeId}</span><span class="hide-sm">${archiveDate()}</span><span class="tui-clock">--:--:--</span><button type="button" class="tui__exit" data-action="exit" aria-label="Exit the archive">EXIT</button></span>
+  </header>
 
-  <button type="button" class="term-close" data-action="power" aria-label="Close the archive and return to the shop" title="Close">${close('term-close__x')}</button>
+  <nav class="tui__tabs" role="tablist" aria-label="Archive sections">
+    ${tabs}
+    <span class="tui__fill"></span>
+    <button type="button" class="tui__req" data-action="cart">REQUISITION <span class="tui__req-n">[00]</span> <span class="tui__req-total">€0.00</span></button>
+  </nav>
 
-  <section class="term-log" aria-hidden="true">${log}</section>
+  <div class="tui__body">
+    <div class="tui__scroll">
+      <section class="tui__panel" id="tui-archive" role="tabpanel" aria-labelledby="tui-tab-archive" data-panel="archive">
+        <div class="tui__bar">
+          <div class="filters" role="group" aria-label="Class">${filters}</div>
+          <span class="grid-count">${pad(PRODUCTS.length)} PATTERNS</span>
+        </div>
+        <div class="grid"></div>
+      </section>
 
-  <div class="term-body">
-    <nav class="term-rail" aria-label="Pattern classification">
-      <p class="term-rail__head" data-intro>++ CLASSIFICATION ++</p>
-      <div class="term-filters">${filters}</div>
-      <div class="term-rail__panel" data-intro>
-        <p class="term-rail__head">++ LICENCE TIERS ++</p>
-        <p><b>&gt; ${LICENCES.personal.terminalLabel}</b> ${LICENCES.personal.summary}</p>
-        <p><b>&gt; ${LICENCES.merchant.terminalLabel}</b> ${LICENCES.merchant.summary}</p>
-      </div>
-      <div class="term-rail__panel term-rail__panel--warn" data-intro>
-        <p>++ PIRATED PATTERNS ARE HERESY ++</p>
-        <p>EVERY FILE CARRIES A LICENCE SEAL.</p>
-      </div>
-    </nav>
+      <section class="tui__panel doc" id="tui-licences" role="tabpanel" aria-labelledby="tui-tab-licences" data-panel="licences" hidden>
+        <h3 class="doc__h">++ LICENCES ++</h3>
+        <p class="doc__lede">You choose the licence when you add a pattern to your requisition.</p>
+        <div class="doc__cols">
+          ${licence('personal', `MODELS FROM ${formatPrice(from)}${free ? ` · ${esc(free.name.toUpperCase())} IS FREE` : ''}`)}
+          ${licence('merchant', '3× THE PERSONAL PRICE')}
+        </div>
+        <p class="doc__note">Each order includes a licence certificate for every pattern on it.</p>
+      </section>
 
-    <main class="term-main">
-      <div class="term-grid__bar"><span class="term-grid__count">&gt; ${pad(PRODUCTS.length)} PATTERNS INDEXED</span><span class="dim">SORT: ARCHIVE ORDER</span></div>
-      <div class="term-grid"></div>
-    </main>
+      <section class="tui__panel doc" id="tui-printing" role="tabpanel" aria-labelledby="tui-tab-printing" data-panel="printing" hidden>
+        <h3 class="doc__h">++ PRINTING ++</h3>
+        <dl class="doc__specs">${leaders(PRINTING)}</dl>
+        ${free ? `<p class="doc__note">To test our supports first, print the free pattern. <button type="button" class="tlink" data-goto="${free.slug}">OPEN ${esc(free.name.toUpperCase())}</button></p>` : ''}
+      </section>
+
+      <section class="tui__panel doc" id="tui-faq" role="tabpanel" aria-labelledby="tui-tab-faq" data-panel="faq" hidden>
+        <h3 class="doc__h">++ FAQ ++</h3>
+        <div class="doc__faq">${FAQ.map(([q, a]) => `<details><summary>${esc(q.toUpperCase())}</summary><p>${esc(a)}</p></details>`).join('')}</div>
+      </section>
+    </div>
   </div>
 
-  <section class="term-codex" aria-label="Archive information">
-    <article>
-      <h2>++ LICENCE CODEX ++</h2>
-      <p>Every requisition issues a licence certificate bound to your account. ${LICENCES.personal.terminalLabel}: ${LICENCES.personal.terms.join(' · ')}. ${LICENCES.merchant.terminalLabel}: ${LICENCES.merchant.terms.join(' · ')}.</p>
-    </article>
-    <article>
-      <h2>++ PRINT DOCTRINE ++</h2>
-      <p>Files ship as a ZIP: supported and unsupported STL, slicer profiles for resin and FDM, and a part map. Recommended layer height 0.03–0.05 mm on resin.</p>
-    </article>
-    <article>
-      <h2>++ VOX CHANNEL ++</h2>
-      <p>Misprint? Missing part? Open a vox ticket from your requisition record and an archivist will answer within one cycle.</p>
-    </article>
-  </section>
-
-  <footer class="term-status">
-    <button type="button" class="term-status__cart" data-action="cart">&gt; REQUISITION [<span class="term-cart-count">00</span>] · <span class="term-cart-total">€0.00</span></button>
-    <span class="term-status__item">++ VOX: CLEAR ++</span>
-    <span class="term-status__item dim hide-sm">NODE ${BRAND.nodeId}</span>
-    <span class="term-status__item dim hide-sm">SCIENTIA · FIDES · VICTORIA</span>
-    <span class="term-status__item dim term-clock">--:--:--</span>
+  <footer class="tui__status">
+    <span class="tui__prompt">&gt; READY<i class="caret" aria-hidden="true"></i></span>
+    <span class="hide-sm">${pad(PRODUCTS.length)} PATTERNS ON FILE</span>
+    <span class="hide-sm">VOX CLEAR</span>
+    <span class="tui__fill"></span>
+    <button type="button" class="tui__req tui__req--sm" data-action="cart">REQ <span class="tui__req-n">[00]</span></button>
+    <button type="button" class="tui__restart" data-action="restart">RESTART</button>
   </footer>
 </div>`;
   }

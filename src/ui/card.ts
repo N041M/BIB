@@ -2,7 +2,6 @@ import { LICENCES } from '../config';
 import { CATEGORIES, type Product } from '../data/catalog';
 import { esc, fromHTML, qs } from '../lib/dom';
 import { formatInt, formatPrice } from '../lib/format';
-import { skull } from '../lib/glyphs';
 import { scramble, settle } from '../lib/scramble';
 import { loadModel, type ModelData } from '../three/models';
 import type { SharedRenderer, StageView } from '../three/renderer';
@@ -71,6 +70,7 @@ export class ProductCard {
     this.entered = false;
     this.view.active = false;
     this.el.classList.remove('is-in', 'is-streaming', 'is-refresh');
+    this.el.style.animationDelay = '';
     this.stage.hideModel();
   }
 
@@ -140,39 +140,33 @@ export class ProductCard {
   private template(): string {
     const p = this.product;
     const cat = CATEGORIES.find((c) => c.id === p.category)?.label ?? '';
-    const tagClass = { NEW: 'tag', SANCTIONED: 'tag tag--red', RARE: 'tag tag--outline', FREE: 'tag tag--alert' }[p.tag ?? 'NEW'];
     return /* html */ `
 <article class="card${p.featured ? ' card--featured' : ''}" data-id="${esc(p.id)}" data-cat="${p.category}">
   <header class="card__head">
     <span class="card__id">${esc(p.id)}</span>
-    <span class="card__cat">${cat}</span>
-    ${p.tag ? `<span class="${tagClass}">${p.tag}</span>` : ''}
-    <span class="card__skull">${skull()}</span>
+    <span>${cat}</span>
+    ${p.tag ? `<span class="card__tag card__tag--${p.tag.toLowerCase()}">${p.tag}</span>` : ''}
   </header>
   <div class="card__view" tabindex="0" role="button" aria-label="Inspect ${esc(p.name)} in 3D. Drag to rotate.">
-    <span class="card__corner card__corner--tl"></span><span class="card__corner card__corner--tr"></span>
-    <span class="card__corner card__corner--bl"></span><span class="card__corner card__corner--br"></span>
-    <span class="card__hint">DRAG ⟲ ROTATE · CLICK INSPECT</span>
-    <span class="card__loading">LOADING PATTERN…</span>
-    ${p.featured ? '<span class="card__feature">◆ PATTERN OF THE MONTH</span>' : ''}
+    <i class="card__tick card__tick--tl"></i><i class="card__tick card__tick--tr"></i><i class="card__tick card__tick--bl"></i><i class="card__tick card__tick--br"></i>
+    <span class="card__loading">RECEIVING PATTERN<i class="caret"></i></span>
+    ${p.featured ? '<span class="card__feature">PATTERN OF THE MONTH</span>' : ''}
+    <span class="card__hint">DRAG TO ROTATE · CLICK TO INSPECT</span>
   </div>
   <div class="card__body">
     <h3 class="card__name">${esc(p.name.toUpperCase())}</h3>
     <p class="card__desc">${esc(p.short)}</p>
-    <p class="card__more">${esc(p.description)}</p>
     <dl class="card__specs">
-      <div><dt>TRIS</dt><dd data-spec="tris">—</dd></div>
       <div><dt>PARTS</dt><dd>${p.parts}</dd></div>
       <div><dt>SCALE</dt><dd>${esc(p.scale)}</dd></div>
+      <div><dt>TRIS</dt><dd data-spec="tris">-</dd></div>
       <div><dt>SUPPORTS</dt><dd>${p.presupported ? 'YES' : 'NO'}</dd></div>
     </dl>
   </div>
   <footer class="card__foot">
-    <div class="card__price"><b>${formatPrice(p.price.personal)}</b><small>${LICENCES.personal.terminalLabel} LICENCE</small></div>
-    <span class="card__acts">
-      <button type="button" class="tbtn tbtn--ghost" data-act="inspect">INSPECT</button>
-      <button type="button" class="tbtn" data-act="cart" aria-pressed="false"><span>REQUISITION</span></button>
-    </span>
+    <p class="card__price"><b>${formatPrice(p.price.personal)}</b><small>${LICENCES.personal.terminalLabel}</small></p>
+    <button type="button" class="tbtn" data-act="inspect">INSPECT</button>
+    <button type="button" class="tbtn tbtn--solid" data-act="cart" aria-pressed="false"><span>REQUISITION</span></button>
   </footer>
 </article>`;
   }

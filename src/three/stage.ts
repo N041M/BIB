@@ -241,7 +241,7 @@ export class ProductStage {
     // wire mode keeps the solid as a depth-only occluder for hidden-line edges
     this.solid.material.colorWrite = !wire;
     this.xray.visible = this.mode === 'xray';
-    this.edges.material.color.copy(wire ? PHOSPHOR.red : PHOSPHOR.line);
+    this.edges.material.color.copy(wire ? PHOSPHOR.bright : PHOSPHOR.line);
   }
 
   private buildFloor(data: ModelData): void {
@@ -274,7 +274,7 @@ export class ProductStage {
     ticks.push(new THREE.Vector3(0, 0, r * 0.8), new THREE.Vector3(0, 0, r * 1.25));
     floor.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ticks), mat));
 
-    const scanMat = new THREE.LineBasicMaterial({ color: PHOSPHOR.red, transparent: true, opacity: 0.4, depthWrite: false });
+    const scanMat = new THREE.LineBasicMaterial({ color: PHOSPHOR.line, transparent: true, opacity: 0.4, depthWrite: false });
     this.scanRing = new THREE.LineLoop(ring(r), scanMat);
     this.scene.add(this.scanRing);
 

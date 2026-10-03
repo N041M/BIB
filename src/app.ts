@@ -1,93 +1,103 @@
 import { BRAND } from './config';
 import { productBySlug } from './data/catalog';
-import { Landing } from './ui/landing';
+import { Page } from './ui/page';
 import type { Screen } from './ui/screen';
 
-type Route = { name: 'landing' } | { name: 'archive'; slug?: string };
+type Route = { name: 'home' } | { name: 'archive'; slug?: string };
 
 const ARCHIVE = '#/archive';
 
 function parse(hash: string): Route {
   const m = hash.match(/^#\/archive(?:\/([\w-]+))?\/?$/);
   if (m) return { name: 'archive', slug: m[1] };
-  return { name: 'landing' };
+  return { name: 'home' };
 }
 
 /**
- * Routes between the ordinary landing page and the cogitator screen.
- *   #/                  landing
- *   #/archive           the storefront
- *   #/archive/<slug>    storefront with a pattern under inspection
+ * Wires the page to the screen below the hero.
+ *   #/                  the page, with the screen in standby
+ *   #/archive           the screen filling the tab
+ *   #/archive/<slug>    a pattern open in the inspector
  *
- * The landing page ships without three.js; the screen (and the 3D engine)
- * is loaded in the background right after first paint.
+ * The hero ships without three.js. The screen and the 3D engine load in the
+ * background right after first paint.
  */
 export class App {
-  private landing: Landing;
+  private page: Page;
   private screen?: Screen;
   private screenReady: Promise<Screen>;
-  private mode: 'landing' | 'booting' | 'archive' | 'leaving' = 'landing';
-  /** True when the inspector route was pushed on top of the archive route by us. */
+  /** True when we pushed the archive route ourselves, so leaving can step back over it. */
+  private archivePushed = false;
+  /** True when we pushed the inspector route on top of the archive ourselves. */
   private inspectPushed = false;
 
-  constructor(private root: HTMLElement) {
-    this.landing = new Landing({ onEnter: (origin) => this.wake(origin) });
-    this.root.append(this.landing.el);
+  constructor(root: HTMLElement) {
+    this.page = new Page({
+      onTab: (tab, from) => this.enter(from, (screen) => screen.showTab(tab)),
+      onCart: (from) => this.enter(from, (screen) => screen.openCart()),
+      onInspect: (slug, from) => this.enter(from, () => this.inspect(slug)),
+    });
+    root.append(this.page.el);
     this.screenReady = import('./ui/screen').then(({ Screen }) => {
-      const screen = new Screen({
-        onInspect: (p) => this.inspect(p),
+      const screen = new Screen(this.page.glass, {
+        onActivate: () => this.enter(),
+        onExit: () => this.exit(),
+        onInspect: (p) => this.inspect(p.slug),
         onCloseInspector: () => this.closeInspect(),
-        onPowerDown: () => this.navigate('#/'),
       });
-      this.root.append(screen.el);
       this.screen = screen;
       return screen;
     });
   }
 
   start(): void {
+    this.page.start();
     window.addEventListener('hashchange', () => this.sync());
     const route = parse(location.hash);
     if (route.name === 'archive') {
-      this.mode = 'booting';
-      this.landing.hide();
-      document.documentElement.classList.add('is-terminal');
       void this.screenReady.then((screen) => {
-        void screen.bootDirect().then(() => this.booted());
+        screen.activate({ instant: true, quick: !!route.slug });
         this.sync();
       });
-    } else {
-      this.landing.show();
     }
+    this.updateMeta(route);
   }
 
-  /** Click on the landing showcase (or any "browse" control). */
-  private wake(origin: DOMRect): void {
-    if (this.mode !== 'landing') return;
-    this.mode = 'booting';
-    if (location.hash !== ARCHIVE) history.pushState(null, '', ARCHIVE);
-    this.updateMeta({ name: 'archive' });
+  /**
+   * Fill the tab with the screen. It grows from the glass when the glass is
+   * on screen, otherwise from the control that was pressed.
+   */
+  private enter(from?: DOMRect, then?: (screen: Screen) => void): void {
+    const origin = from && !this.page.glassInView() ? from : undefined;
     void this.screenReady.then((screen) => {
-      this.landing.leave();
-      return screen
-        .boot(origin, () => {
-          this.landing.hide();
-          document.documentElement.classList.add('is-terminal');
-        })
-        .then(() => this.booted());
+      if (!screen.isActive) {
+        if (parse(location.hash).name !== 'archive') {
+          history.pushState(null, '', ARCHIVE);
+          this.archivePushed = true;
+        }
+        this.updateMeta(parse(location.hash));
+        screen.activate({ origin });
+      }
+      then?.(screen);
     });
   }
 
-  private booted(): void {
-    // a Back press mid-boot may already have started powering down
-    if (this.mode !== 'booting') return;
-    this.mode = 'archive';
-    this.sync();
+  /** Leave the archive. Back returns to it, the same as any other page. */
+  private exit(): void {
+    if (this.archivePushed) {
+      history.go(this.inspectPushed ? -2 : -1);
+    } else {
+      location.hash = '#/';
+    }
+    this.archivePushed = false;
+    this.inspectPushed = false;
   }
 
-  private inspect(product: { slug: string }): void {
+  private inspect(slug: string): void {
+    const hash = `${ARCHIVE}/${slug}`;
+    if (location.hash === hash) return;
     this.inspectPushed = true;
-    this.navigate(`${ARCHIVE}/${product.slug}`);
+    location.hash = hash;
   }
 
   private closeInspect(): void {
@@ -95,59 +105,39 @@ export class App {
       this.inspectPushed = false;
       history.back();
     } else {
-      this.navigate(ARCHIVE);
+      location.hash = ARCHIVE;
     }
   }
 
-  private navigate(hash: string): void {
-    if (location.hash === hash) return;
-    location.hash = hash;
-  }
-
-  /** Reconcile what's on screen with the current hash. */
+  /** Reconcile the screen with the current hash (Back, Forward, typed URLs). */
   private sync(): void {
     const route = parse(location.hash);
     this.updateMeta(route);
-    if (route.name === 'landing') {
-      this.inspectPushed = false;
-      if (this.mode === 'archive' || this.mode === 'booting') void this.powerDown();
-      return;
-    }
-    if (this.mode === 'landing') {
-      // e.g. browser "forward" back into the archive
-      this.wake(this.landing.screenRect());
-      return;
-    }
     const screen = this.screen;
     if (!screen) return;
+    if (route.name === 'home') {
+      this.archivePushed = false;
+      this.inspectPushed = false;
+      void screen.deactivate();
+      return;
+    }
+    if (!screen.isActive) screen.activate({ quick: !!route.slug });
     const product = route.slug ? productBySlug(route.slug) : undefined;
     if (product) {
       if (!screen.inspector.isOpen) screen.openInspector(product);
     } else {
       this.inspectPushed = false;
-      if (screen.inspector.isOpen) screen.closeInspector();
+      screen.closeInspector();
     }
   }
 
   private updateMeta(route: Route): void {
     const product = route.name === 'archive' && route.slug ? productBySlug(route.slug) : undefined;
     document.title =
-      route.name === 'landing'
+      route.name === 'home'
         ? `${BRAND.name} · Licensed STL models`
         : product
           ? `${product.name.toUpperCase()} // ${BRAND.terminalName}`
           : `${BRAND.terminalName} // ${BRAND.terminalSub}`;
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', route.name === 'landing' ? '#111215' : '#0b0b0d');
-  }
-
-  private async powerDown(): Promise<void> {
-    this.mode = 'leaving';
-    const screen = await this.screenReady;
-    await screen.powerDown();
-    document.documentElement.classList.remove('is-terminal');
-    this.landing.returnFromTerminal();
-    this.mode = 'landing';
   }
 }

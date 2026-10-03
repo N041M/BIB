@@ -1,42 +1,49 @@
 # Based in Battle · Pattern Archive
 
-A storefront for licensed STL miniatures ([basedinbattle.com](https://basedinbattle.com))
-that starts as an ordinary, modern landing page in gunmetal, silver and crimson. Click the product showcase in the hero and the page gives way to a
-cogitator screen inspired by grimdark gothic sci-fi: a crimson combat-visor HUD,
-then a cogitator printout on scratched red-black glass: uppercase pixel type,
-`++` lines, `>` prompts with dotted leaders, and a single close mark:
+A storefront for licensed STL miniatures ([basedinbattle.com](https://basedinbattle.com)).
+The page has a hero at the top and a cogitator screen below it, styled after
+the green phosphor terminals in grimdark gothic sci-fi. The screen waits in
+standby with a flashing "READY FOR USE" message. Activating it starts the
+archive in five steps:
 
-1. **Wake.** The showcase panel powers on in place (a hot line, static), then
-   grows until it *is* the page while the landing page dims and blurs away
-   underneath it.
-2. **Visor HUD.** Noisy, teal and half-legible. Brackets draw in, panels and
-   readouts flicker on at random, the objective plate goes from `STANDBY` to
-   `SIGNAL LOCKED`, and a dark silhouette of the flagship model turns behind it.
-3. **Clear.** The HUD tears and flickers away. Noise, blur and the teal tint
-   drain out, leaving a clean terminal readout.
-4. **Stream.** A boot log prints over the empty screen, holding on
-   `LOAD HOLO-PLINTHS` until every model has downloaded, and ends in
-   `++ LINK ESTABLISHED: BASEDINBATTLE.COM ++`. It then fades away and the
-   archive streams in from the top, each 3D model building from the bottom up.
+1. **Take over.** The glass grows from where it sits on the page (or from the
+   button that was pressed) until it fills the tab. The page underneath fades
+   out and stops scrolling.
+2. **Power on.** A point of light in the centre draws out into a line, and the
+   line opens into an overexposed raster that settles to black.
+3. **Degauss.** The first readout bends in horizontal waves and blooms for a
+   moment, then settles flat.
+4. **Telemetry.** A start-up log scrolls past at several lines per frame, next
+   to memory, carrier, pattern index and stack panels. The pattern index and
+   the `RECV` lines report the real model downloads, and the log waits on a
+   slow one for up to five seconds.
+5. **Archive.** The screen redraws from the top behind a bright scan line, and
+   each 3D model builds from the bottom up.
 
-No device or monitor frame is ever drawn: the landing page shows an ordinary
-product shot, and the terminal fills the whole viewport. Press **Esc** or **Skip** to jump
-straight to the store, and click the X in the top-right to power the
-screen back down.
+**Esc** or **Skip** jumps straight to the archive. **EXIT** in the title bar,
+or the browser's Back button, powers the screen off: the picture folds into a
+line, the line pulls in to a point, the point fades, and the glass shrinks
+back onto the page.
+
+Only the screen is drawn, never a monitor around it. The glass has scanlines,
+grain, a slow hum bar, a dark falloff at the edges, a faint reflection and
+fine scratches.
 
 ## Features
 
-- **Interactive 3D on every card.** Drag to turn, hover to brighten; the
-  models spin while idle. All cards share **one** WebGL context: a canvas sits
-  behind the page and draws each model into its card's rectangle with the
-  scissor test.
-- **Inspector** (`#/archive/<slug>`). Orbit, zoom and pan, with **Solid /
-  Wire / X-ray** render modes, live azimuth, elevation and zoom readouts, a
-  millimetre scale bar, and dimensions, triangle count and file size read
-  from the actual STL.
-- **Licences.** Personal or Merchant per model, with a cart (stored in
-  `localStorage`) and a simulated checkout. No payment is taken.
-- **Routing.** `#/` is the landing page, `#/archive` the store, and
+- **Interactive 3D on every card.** Drag to turn, hover to brighten. The
+  models spin while idle. All cards share one WebGL context: a canvas sits
+  behind the store markup and draws each model into its card's rectangle
+  with the scissor test.
+- **Inspector** (`#/archive/<slug>`). Opens over the archive on the same
+  screen. Orbit, zoom and pan, with **Solid / Wire / X-ray** render modes,
+  live azimuth, elevation and zoom readouts, a millimetre scale bar, and
+  dimensions, triangle count and file size read from the actual STL.
+- **Sections.** Archive, Licences, Printing and FAQ are tabs in the
+  terminal. Keys **1** to **4** switch between them.
+- **Licences.** Personal or Merchant per model, with a requisition drawer
+  (stored in `localStorage`) and a simulated checkout. No payment is taken.
+- **Routing.** `#/` is the page, `#/archive` the screen, and
   `#/archive/<slug>` a deep link to a model. Back and Forward work as
   expected.
 - **Accessibility.** Real buttons and dialogs, focus trapping, Esc to close,
@@ -92,32 +99,31 @@ breaking.
 
 - `src/config.ts`: brand name, domain, terminal name, currency/locale and
   licence terms.
-- `src/styles/base.css`: the shared crimson / silver / gunmetal palette, plus
-  tokens for the landing page (`--lp-*`) and the terminal (`--t-*`).
-- `src/three/phosphor.ts`: the pewter / crimson-rim model shader and its
-  palette.
+- `src/styles/base.css`: the page palette and the phosphor ramp (`--p-*`)
+  used on the screen.
+- `src/three/phosphor.ts`: the model shader and its green palette.
 
 ## Layout
 
 ```
 src/
-  app.ts               routing between landing and screen
+  app.ts               routing between the page and the screen
   config.ts            brand, currency, licences
   data/catalog.ts      products
   state/cart.ts        cart store (localStorage)
-  lib/                 DOM helpers, cancellable timeline, text scramble, glyphs
+  lib/                 DOM helpers, cancellable timeline, text scramble
   three/
     models.ts          STL loading, normalising, caching
     phosphor.ts        phosphor / x-ray shader
     stage.ts           one model on a holo-plinth (camera fit, build-up, modes)
     renderer.ts        shared scissor renderer for all cards
   ui/
-    landing.ts         the ordinary landing page and its hero showcase
-    screen.ts          the takeover + boot choreography
-    hud.ts             visor HUD (boot phase)
-    store.ts, card.ts  terminal storefront
-    inspector.ts       full-screen 3D inspection dialog
-    cart.ts            requisition manifest + simulated checkout
+    page.ts            top bar, hero, the section that holds the screen, footer
+    screen.ts          standby, take-over, boot choreography, exit
+    boot.ts            power-on, degauss, telemetry readout, power-off
+    store.ts, card.ts  the archive as a terminal program
+    inspector.ts       3D inspection over the archive
+    cart.ts            requisition drawer and simulated checkout
 scripts/generate-models.mjs   procedural STL generator
 ```
 

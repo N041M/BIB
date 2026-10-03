@@ -4,7 +4,6 @@ import { LICENCES, type LicenceId } from '../config';
 import { CATEGORIES, type Product } from '../data/catalog';
 import { esc, fromHTML, prefersReducedMotion, qs, qsa } from '../lib/dom';
 import { formatBytes, formatInt, formatMoney, formatPrice } from '../lib/format';
-import { close, skull } from '../lib/glyphs';
 import { scramble } from '../lib/scramble';
 import { cart } from '../state/cart';
 import { loadModel, type ModelData } from '../three/models';
@@ -15,7 +14,7 @@ export interface InspectorCallbacks {
   onOpenCart: () => void;
 }
 
-/** Full-screen pattern inspection: orbit, zoom, pan, render modes, licence picker. */
+/** Pattern inspection over the archive: orbit, zoom, pan, render modes and the licence picker. */
 export class Inspector {
   readonly el: HTMLElement;
   private renderer?: THREE.WebGLRenderer;
@@ -232,7 +231,7 @@ export class Inspector {
     qs(this.el, '[data-spec="parts"]').textContent = String(p.parts);
     qs(this.el, '[data-spec="supports"]').textContent = p.presupported ? 'PRE-SUPPORTED + RAW' : 'RAW · SUPPORT-FREE';
     qs(this.el, '[data-spec="scale"]').textContent = p.scale;
-    ['dims', 'tris', 'size'].forEach((k) => (qs(this.el, `[data-spec="${k}"]`).textContent = 'COMPUTING…'));
+    ['dims', 'tris', 'size'].forEach((k) => (qs(this.el, `[data-spec="${k}"]`).textContent = 'MEASURING...'));
     (['personal', 'merchant'] as LicenceId[]).forEach((id) => {
       qs(this.el, `[data-price="${id}"]`).textContent = formatPrice(p.price[id]);
       const input = qs<HTMLInputElement>(this.el, `input[value="${id}"]`);
@@ -285,7 +284,7 @@ export class Inspector {
         <label class="lic">
           <input type="radio" name="licence" value="${id}">
           <span class="lic__box">
-            <span class="lic__head"><i class="box"></i><b>${l.terminalLabel}</b><em data-price="${id}"></em></span>
+            <span class="lic__head"><i class="lic__mark" aria-hidden="true"></i><b>${l.terminalLabel}</b><em data-price="${id}"></em></span>
             <span class="lic__sum">${esc(l.summary)}</span>
             <span class="lic__terms">${l.terms.map((t) => esc(t.toUpperCase())).join(' · ')}</span>
           </span>
@@ -293,28 +292,26 @@ export class Inspector {
     };
     return /* html */ `
 <div class="insp" role="dialog" aria-modal="true" aria-labelledby="insp-title" hidden>
-  <div class="insp__scrim" data-close></div>
   <div class="insp__panel">
     <header class="insp__head">
-      <span class="insp__head-l">${skull()} PATTERN INSPECTION // <b class="insp__id"></b></span>
-      <button type="button" class="insp__close tbtn tbtn--ghost" data-close aria-label="Close inspection">CLOSE <kbd>ESC</kbd> ${close()}</button>
+      <span>INSPECT <span class="tui__sep">//</span> <b class="insp__id"></b></span>
+      <button type="button" class="insp__close tbtn" data-close aria-label="Close inspection">CLOSE <kbd>ESC</kbd></button>
     </header>
     <div class="insp__body">
       <div class="insp__view">
-        <span class="card__corner card__corner--tl"></span><span class="card__corner card__corner--tr"></span>
-        <span class="card__corner card__corner--bl"></span><span class="card__corner card__corner--br"></span>
+        <i class="card__tick card__tick--tl"></i><i class="card__tick card__tick--tr"></i><i class="card__tick card__tick--bl"></i><i class="card__tick card__tick--br"></i>
         <div class="insp__ro">
           <span>AZ <b data-ro="az">000°</b></span>
           <span>EL <b data-ro="el">+00°</b></span>
           <span>ZOOM <b data-ro="zoom">1.00×</b></span>
         </div>
         <div class="insp__scale"><span class="insp__scale-bar"></span><span class="insp__scale-label">10 MM</span></div>
-        <p class="insp__hint">DRAG ROTATE · WHEEL/PINCH ZOOM · RIGHT-DRAG PAN</p>
+        <p class="insp__hint">DRAG TO ROTATE · SCROLL OR PINCH TO ZOOM · RIGHT-DRAG TO PAN</p>
         <div class="insp__modes" role="toolbar" aria-label="Render mode">
           <button type="button" class="tbtn tbtn--seg is-on" data-mode="solid" aria-pressed="true">SOLID</button>
           <button type="button" class="tbtn tbtn--seg" data-mode="wire" aria-pressed="false">WIRE</button>
           <button type="button" class="tbtn tbtn--seg" data-mode="xray" aria-pressed="false">X-RAY</button>
-          <span class="insp__modes-gap"></span>
+          <span class="tui__fill"></span>
           <button type="button" class="tbtn tbtn--seg is-on" data-act="spin" aria-pressed="true">AUTO-ROT</button>
           <button type="button" class="tbtn tbtn--seg" data-act="reset">RESET</button>
         </div>
@@ -339,7 +336,7 @@ export class Inspector {
         </fieldset>
         <div class="insp__buy">
           <span class="insp__price"></span>
-          <button type="button" class="tbtn tbtn--primary" data-act="add"><span>ADD TO REQUISITION</span></button>
+          <button type="button" class="tbtn tbtn--solid" data-act="add"><span>ADD TO REQUISITION</span></button>
         </div>
         <p class="insp__fine">Delivered as a ZIP with supported and raw STL files, slicer profiles and a licence certificate.</p>
       </div>

@@ -9,8 +9,9 @@ export interface StageView {
 }
 
 /**
- * One WebGL context for every product card: a canvas fixed behind the store
- * markup, drawing each stage into its element's rectangle with the scissor test.
+ * One WebGL context for every product card. The canvas sits behind the store
+ * markup and draws each stage into its element's rectangle with the scissor test.
+ * The caller places `canvas` in the page.
  */
 export class SharedRenderer {
   readonly canvas: HTMLCanvasElement;
@@ -22,7 +23,7 @@ export class SharedRenderer {
   private width = 0;
   private height = 0;
 
-  constructor(host: HTMLElement) {
+  constructor() {
     let renderer: THREE.WebGLRenderer | undefined;
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -42,7 +43,6 @@ export class SharedRenderer {
     }
     this.canvas.className = 'gl-canvas';
     this.canvas.setAttribute('aria-hidden', 'true');
-    host.append(this.canvas);
   }
 
   /** Compile a stage's shaders ahead of time so its first frame doesn't hitch. */
@@ -75,9 +75,14 @@ export class SharedRenderer {
   }
 
   stop(): void {
+    this.freeze();
+    this.renderer?.clear();
+  }
+
+  /** Stop drawing but keep the last frame, so it can be animated along with the page. */
+  freeze(): void {
     cancelAnimationFrame(this.raf);
     this.raf = 0;
-    this.renderer?.clear();
   }
 
   private render(dt: number): void {

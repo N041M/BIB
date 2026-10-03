@@ -1,14 +1,14 @@
 import * as THREE from 'three';
 
-/** Palette for the cogitator screen, in sRGB hex: pewter models with a crimson rim light. */
+/** Palette for the cogitator screen, in sRGB hex: a single green phosphor from black to overexposed. */
 export const PHOSPHOR = {
-  dark: new THREE.Color('#0d0e11'),
-  lit: new THREE.Color('#a4aab2'),
-  rim: new THREE.Color('#ff2a1f'),
-  hot: new THREE.Color('#ffb3aa'),
-  line: new THREE.Color('#8c9199'),
-  lineDim: new THREE.Color('#4a4d54'),
-  red: new THREE.Color('#e2242a'),
+  dark: new THREE.Color('#010502'),
+  lit: new THREE.Color('#8ee68a'),
+  rim: new THREE.Color('#d6f9cd'),
+  hot: new THREE.Color('#f0ffec'),
+  line: new THREE.Color('#62b562'),
+  lineDim: new THREE.Color('#2b5c30'),
+  bright: new THREE.Color('#bdf5b4'),
 };
 
 const vertexShader = /* glsl */ `
@@ -50,22 +50,22 @@ const fragmentShader = /* glsl */ `
     if (!gl_FrontFacing) n = -n;
     vec3 v = normalize(-vViewPos);
 
-    // pewter: a key light, a cool fill, a little sky/ground bias and a tight metallic highlight
+    // a key light, a soft fill, a little sky/ground bias and a tight highlight
     vec3 keyDir = normalize(vec3(0.45, 0.75, 0.55));
     vec3 fillDir = normalize(vec3(-0.75, 0.15, 0.35));
     float key = max(dot(n, keyDir), 0.0);
     float fill = max(dot(n, fillDir), 0.0);
     float hemi = 0.5 + 0.5 * n.y;
     float shade = key * 0.72 + fill * 0.16 + hemi * 0.2;
-    // light posterisation: the tube bands the image a little
-    shade = mix(shade, floor(shade * 6.0 + 0.5) / 6.0, 0.25);
+    // the tube bands the image into a few phosphor levels
+    shade = mix(shade, floor(shade * 6.0 + 0.5) / 6.0, 0.4);
 
     vec3 halfDir = normalize(keyDir + v);
     float spec = pow(max(dot(n, halfDir), 0.0), 42.0);
     float fres = pow(1.0 - clamp(dot(n, v), 0.0, 1.0), 3.6);
     vec3 col = mix(uDark, uLit, clamp(shade, 0.0, 1.1));
-    col += vec3(0.85, 0.87, 0.9) * spec * uSpec;
-    // crimson rim light, only at grazing angles
+    col += uHot * spec * uSpec;
+    // bright rim at grazing angles
     col += uRim * fres * uRimStrength * (0.5 + 0.9 * uHover);
 
     float scan = 1.0 - uScan * (0.5 + 0.5 * sin(gl_FragCoord.y * 1.35 - uTime * 5.0));

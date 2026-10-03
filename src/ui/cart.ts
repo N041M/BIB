@@ -2,11 +2,11 @@ import { LICENCES, type LicenceId } from '../config';
 import { productById } from '../data/catalog';
 import { fromHTML, h, qs, qsa } from '../lib/dom';
 import { formatMoney, formatPrice, pad } from '../lib/format';
-import { CATEGORY_GLYPH, close, skull } from '../lib/glyphs';
+import { CATEGORY_GLYPH } from '../lib/glyphs';
 import { Sequence } from '../lib/sequence';
 import { cart } from '../state/cart';
 
-/** The requisition manifest: a slide-in drawer with a (demo) checkout rite. */
+/** The requisition manifest: a drawer over the archive with a simulated checkout. */
 export class CartDrawer {
   readonly el: HTMLElement;
   private list: HTMLElement;
@@ -72,9 +72,9 @@ export class CartDrawer {
           h(
             'button',
             { type: 'button', class: 'cart__link', onclick: () => cart.set(p, other) },
-            `→ ${LICENCES[other].terminalLabel}`,
+            `SWITCH TO ${LICENCES[other].terminalLabel}`,
           ),
-          h('button', { type: 'button', class: 'cart__link cart__link--alert', onclick: () => cart.remove(p.id), 'aria-label': `Remove ${p.name}` }, 'PURGE'),
+          h('button', { type: 'button', class: 'cart__link cart__link--alert', onclick: () => cart.remove(p.id), 'aria-label': `Remove ${p.name}` }, 'REMOVE'),
         ),
       );
       this.list.append(li);
@@ -106,7 +106,7 @@ export class CartDrawer {
     }
     await seq.wait(200);
     log.append(h('p', { class: 'is-hot' }, `++ REQUISITION ${ref} ACCEPTED · ${total} ++`));
-    log.append(h('p', { class: 'is-note' }, 'DEMO STOREFRONT: NO PAYMENT WAS TAKEN AND NO FILES WERE SENT.'));
+    log.append(h('p', { class: 'is-note' }, 'This is a demo. No payment was taken and no files were sent.'));
     this.el.classList.add('is-done');
     cart.clear();
     qs<HTMLButtonElement>(this.el, '[data-act="done"]').focus({ preventScroll: true });
@@ -126,20 +126,19 @@ export class CartDrawer {
   <div class="cart__scrim" data-close></div>
   <div class="cart__panel" role="dialog" aria-modal="true" aria-labelledby="cart-title">
     <header class="cart__head">
-      <h2 id="cart-title">${skull()} REQUISITION MANIFEST <span class="dim">[<span class="cart__count">00</span>]</span></h2>
-      <button type="button" class="cart__close tbtn tbtn--ghost" data-close aria-label="Close manifest">${close()}</button>
+      <h2 id="cart-title">REQUISITION <span class="dim">[<span class="cart__count">00</span>]</span></h2>
+      <button type="button" class="cart__close tbtn" data-close aria-label="Close requisition">CLOSE <kbd>ESC</kbd></button>
     </header>
     <ul class="cart__list"></ul>
     <div class="cart__empty">
       <p>NO PATTERNS REQUISITIONED.</p>
-      <p class="dim">THE ARCHIVE AWAITS YOUR SELECTION.</p>
+      <p class="dim">Add a pattern from the archive to see it here.</p>
     </div>
     <div class="cart__log" aria-live="polite"></div>
     <footer class="cart__foot">
       <div class="cart__sum"><span>TOTAL TITHE</span><b class="cart__total">€0.00</b></div>
-      <button type="button" class="tbtn tbtn--primary cart__go" data-act="checkout"><span>TRANSMIT REQUISITION</span></button>
-      <button type="button" class="tbtn cart__done" data-act="done"><span>CLOSE MANIFEST</span></button>
-      <p class="cart__fine">Demo storefront. Checkout is simulated and no payment is taken.</p>
+      <button type="button" class="tbtn tbtn--solid cart__go" data-act="checkout"><span>TRANSMIT REQUISITION</span></button>
+      <button type="button" class="tbtn cart__done" data-act="done"><span>CLOSE</span></button>
     </footer>
   </div>
 </aside>`;

@@ -1,12 +1,11 @@
 import '@fontsource-variable/inter';
-import '@fontsource-variable/cinzel';
+import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/vt323';
 import '@fontsource/share-tech-mono';
 import './styles/base.css';
-import './styles/landing.css';
-import './styles/screen.css';
-import './styles/hud.css';
-import './styles/terminal.css';
+import './styles/page.css';
+import './styles/crt.css';
+import './styles/term.css';
 import './styles/overlays.css';
 import { App } from './app';
 

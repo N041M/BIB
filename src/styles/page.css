@@ -1,0 +1,482 @@
+/* ───────────────── Top bar ───────────────── */
+
+/* while the screen fills the tab the page underneath fades out and stops scrolling */
+html.is-terminal {
+  overflow: hidden;
+}
+
+.bar,
+.hero,
+.foot {
+  transition:
+    opacity 0.7s ease,
+    filter 0.7s ease;
+}
+
+html.is-dimmed .bar,
+html.is-dimmed .hero,
+html.is-dimmed .foot {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+.bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: var(--bar-h);
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 28px);
+  padding: 0 var(--gutter);
+  background: rgb(7 9 8 / 0.84);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  font: 12.5px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.bar__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--ink);
+  text-decoration: none;
+  font: 600 18px/1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mark {
+  width: 17px;
+  height: 20px;
+  color: var(--accent);
+  flex: none;
+}
+
+.bar__nav {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.bar__nav button,
+.bar__req {
+  background: none;
+  border: 0;
+  padding: 9px 10px;
+  cursor: pointer;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink-2);
+  transition: color 0.2s ease;
+}
+
+.bar__nav button:hover,
+.bar__req:hover {
+  color: var(--ink);
+}
+
+.bar__req {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 1px solid var(--line);
+  padding-left: clamp(12px, 2vw, 24px);
+}
+
+.bar__count {
+  min-width: 22px;
+  padding: 3px 5px;
+  border: 1px solid var(--line-2);
+  text-align: center;
+  color: var(--muted);
+}
+
+.bar__req.has-items .bar__count {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.bar__clock {
+  display: flex;
+  gap: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bar__time {
+  color: var(--ink-2);
+  min-width: 8ch;
+}
+
+@media (max-width: 1080px) {
+  .bar__date {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .bar__nav {
+    display: none;
+  }
+  .bar__req {
+    margin-left: auto;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .bar__clock {
+    display: none;
+  }
+}
+
+/* ───────────────── Hero ───────────────── */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: calc(var(--bar-h) + clamp(40px, 8vh, 96px)) var(--gutter) 112px;
+  display: grid;
+  grid-template-columns: minmax(0, 580px) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+  scroll-snap-align: start;
+}
+
+/* kept empty on purpose: this is where a 3D piece will sit */
+.hero__stage {
+  align-self: stretch;
+  min-height: 420px;
+}
+
+.hero__title {
+  margin: 0;
+  font: 600 clamp(52px, 7.6vw, 116px) / 0.92 var(--font-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.hero__role {
+  margin: 22px 0 0;
+  font: 13px/1.5 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.hero__role span {
+  color: var(--muted);
+}
+
+.hero__lede {
+  margin: 18px 0 0;
+  max-width: 48ch;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line-2);
+  background: transparent;
+  cursor: pointer;
+  font: 12.5px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn:hover {
+  border-color: var(--ink-2);
+}
+
+.btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--primary:hover {
+  border-color: #b9f3b3;
+  background: #b9f3b3;
+}
+
+.link {
+  display: inline-flex;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 12.5px/1.5 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.link span {
+  transition: transform 0.2s ease;
+}
+
+.link:hover span {
+  transform: translateX(3px);
+}
+
+.hero__aside {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  margin: 22px 0 0;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* the data plate under the buttons */
+.plate {
+  position: relative;
+  max-width: 540px;
+  margin-top: 40px;
+  border: 1px solid var(--line-2);
+  background: linear-gradient(180deg, var(--surface), var(--bg-2));
+}
+
+.plate::before,
+.plate::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 0 solid var(--accent);
+}
+
+.plate::before {
+  top: -1px;
+  left: -1px;
+  border-width: 1px 0 0 1px;
+}
+
+.plate::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 1px 1px 0;
+}
+
+.plate__head {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  font: 11.5px/1.4 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.plate__head span:last-child {
+  color: var(--ink-2);
+}
+
+.plate__name {
+  margin: 16px 16px 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.plate__desc {
+  margin: 6px 16px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.plate__specs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+.plate__specs div {
+  padding: 10px 16px 12px;
+  border-left: 1px solid var(--line);
+}
+
+.plate__specs div:first-child {
+  border-left: 0;
+}
+
+.plate__specs dt {
+  font: 10.5px/1.4 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.plate__specs dd {
+  margin: 3px 0 0;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.plate__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.plate__price b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.hero__scroll {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 11px/1 var(--font-mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero__scroll i {
+  position: relative;
+  width: 64px;
+  height: 1px;
+  background: var(--line-2);
+  overflow: hidden;
+}
+
+.hero__scroll i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: var(--accent);
+  animation: scroll-hint 2.4s var(--ease-out) infinite;
+}
+
+@keyframes scroll-hint {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+@media (max-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+  .hero__stage {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .plate__specs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .plate__specs div:nth-child(3) {
+    border-left: 0;
+  }
+  .plate__specs div:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* ───────────────── The section that holds the screen ───────────────── */
+
+.archive {
+  position: relative;
+  height: 100svh;
+  min-height: 540px;
+  padding: calc(var(--bar-h) + 14px) var(--gutter) 16px;
+  scroll-snap-align: start;
+}
+
+/* ───────────────── Footer ───────────────── */
+
+.foot {
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 36px var(--gutter) 44px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px 40px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.foot__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 15px/1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.foot__brand .mark {
+  width: 13px;
+  height: 16px;
+}
+
+.foot p {
+  margin: 0;
+  max-width: 78ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll i::after {
+    animation: none;
+  }
+}
