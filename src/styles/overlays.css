@@ -30,7 +30,7 @@
   width: min(1320px, calc(100% - 2 * clamp(8px, 2.4vw, 32px)));
   height: min(860px, calc(100% - 2 * clamp(8px, 2.4vh, 32px)));
   border: 1px solid var(--t-line);
-  background: linear-gradient(180deg, #111215, #0b0b0d);
+  background: var(--t-panel);
   box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6), 0 -3px 0 rgb(var(--t-red-rgb) / 0.55) inset, 0 30px 80px rgb(0 0 0 / 0.7);
   clip-path: inset(50% 0 50% 0);
   transition: clip-path 0.42s cubic-bezier(0.65, 0, 0.35, 1);
@@ -227,14 +227,13 @@
 .insp__name {
   margin: 0;
   min-height: 1em;
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: clamp(24px, 2.4vw, 34px);
-  line-height: 1.12;
-  letter-spacing: 0.05em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 3vw, 44px);
+  line-height: 1;
+  letter-spacing: 0.04em;
   color: var(--t-fg-hi);
   text-shadow: var(--t-glow-hi);
-  text-wrap: balance;
 }
 
 .insp__desc {
@@ -280,13 +279,11 @@
 }
 
 .insp__lic legend {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   padding: 0;
-  font-family: var(--font-gothic);
-  font-weight: 700;
   font-size: 11px;
-  letter-spacing: 0.26em;
-  color: var(--t-fg-hi);
+  letter-spacing: 0.2em;
+  color: var(--t-fg-dim);
   text-shadow: none;
 }
 
@@ -337,9 +334,8 @@
 .lic__head em {
   margin-left: auto;
   font-style: normal;
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 17px;
+  font-family: var(--font-display);
+  font-size: 24px;
   line-height: 1;
   color: var(--t-fg-hi);
 }
@@ -365,9 +361,8 @@
 }
 
 .insp__price {
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 32px;
+  font-family: var(--font-display);
+  font-size: 42px;
   line-height: 1;
   color: var(--t-fg-hi);
   text-shadow: var(--t-glow-hi);
@@ -461,7 +456,7 @@
   flex-direction: column;
   width: min(460px, 100%);
   border-left: 1px solid var(--t-line);
-  background: linear-gradient(180deg, #111215, #0b0b0d);
+  background: var(--t-panel);
   transform: translateX(102%);
   transition: transform 0.36s cubic-bezier(0.65, 0, 0.35, 1);
 }
@@ -484,11 +479,12 @@
   align-items: center;
   gap: 10px;
   margin: 0;
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: 0.16em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 27px;
+  letter-spacing: 0.06em;
   color: var(--t-fg-hi);
+  text-shadow: var(--t-glow-hi);
 }
 
 .cart__head h2 svg {
@@ -528,11 +524,10 @@
 }
 
 .cart__meta b {
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.2;
-  letter-spacing: 0.05em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1;
   color: var(--t-fg-hi);
 }
 
@@ -544,9 +539,8 @@
 
 .cart__price {
   grid-area: p;
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 16px;
+  font-family: var(--font-display);
+  font-size: 24px;
   color: var(--t-fg-hi);
 }
 
@@ -655,11 +649,12 @@
 }
 
 .cart__sum b {
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 28px;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 34px;
+  letter-spacing: 0.04em;
   color: var(--t-fg-hi);
+  text-shadow: var(--t-glow-hi);
 }
 
 .cart__go,

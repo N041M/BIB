@@ -2,7 +2,7 @@ import { BRAND, LICENCES } from '../config';
 import { CATEGORIES, PRODUCTS, type CategoryId, type Product } from '../data/catalog';
 import { fromHTML, qs, qsa } from '../lib/dom';
 import { archiveDate, clock, formatMoney, pad } from '../lib/format';
-import { CATEGORY_GLYPH, puritySeal, sigil, skull } from '../lib/glyphs';
+import { CATEGORY_GLYPH, sigil, skull } from '../lib/glyphs';
 import { scramble, settle } from '../lib/scramble';
 import type { Sequence } from '../lib/sequence';
 import { cart } from '../state/cart';
@@ -87,9 +87,6 @@ export class Store {
     this.type('.term-band__line[data-line="1"]', 560);
     await seq.wait(200);
     this.type('.term-band__line[data-line="2"]', 520);
-    await seq.wait(260);
-    step('.term-seal');
-    step('.term-motto');
     step('.term-hero__aside');
     qsa(this.el, '.term-meta dd').forEach((dd, i) => this.typeEl(dd, 360, 120 + i * 90));
     await seq.wait(320);
@@ -122,7 +119,7 @@ export class Store {
 
   /** Snap to the finished state (skip, reduced motion, or direct deep link). */
   finishIntro(): void {
-    qsa(this.el, '.term-top, .term-band, .term-band__label, .term-hero__aside, .term-status, .term-codex, .term-seal, .term-motto, .term-rail [data-intro]').forEach(
+    qsa(this.el, '.term-top, .term-band, .term-band__label, .term-hero__aside, .term-status, .term-codex, .term-rail [data-intro]').forEach(
       (el) => el.classList.add('is-in'),
     );
     this.texts.forEach((text, el) => {
@@ -225,13 +222,11 @@ export class Store {
     </div>
 
     <div class="term-band-wrap">
-      <div class="term-band__label"><span data-typed="REQUISITION OBJECTIVES">REQUISITION OBJECTIVES</span></div>
+      <div class="term-band__label"><span data-typed="REQUISITION OBJECTIVES:">REQUISITION OBJECTIVES:</span></div>
       <div class="term-band">
         <p class="term-band__line" data-line="1" data-typed="PRIMUS — ACQUIRE SANCTIONED PATTERNS">PRIMUS — ACQUIRE SANCTIONED PATTERNS</p>
         <p class="term-band__line" data-line="2" data-typed="SECUNDUS — PRINT. PAINT. TAKE THE FIELD.">SECUNDUS — PRINT. PAINT. TAKE THE FIELD.</p>
       </div>
-      <div class="term-seal">${puritySeal()}</div>
-      <p class="term-motto">SCIENTIA · FIDES · VICTORIA</p>
     </div>
 
     <div class="term-hero__aside term-hero__aside--right">
@@ -284,6 +279,7 @@ export class Store {
     <span class="term-status__item">+++ VOX: CLEAR +++</span>
     <span class="term-status__item dim">LINK 98.2%</span>
     <span class="term-status__item dim hide-sm">NODE ${BRAND.nodeId}</span>
+    <span class="term-status__item dim hide-sm">SCIENTIA · FIDES · VICTORIA</span>
     <span class="term-status__dat">DAT-F12 <b>00</b></span>
   </footer>
 </div>`;

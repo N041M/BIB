@@ -1,6 +1,6 @@
 /* ───────────────── The clear terminal / storefront ─────────────────
-   Gunmetal plates, silver type, one crimson banner. Data stays in the
-   cogitator's monospace; names and headings are engraved capitals. */
+   A cogitator readout, not a web page: flat screen panels, hairlines,
+   pixel and monospace type in silver, one inverted crimson band. */
 
 .term {
   --top-h: 60px;
@@ -30,15 +30,15 @@
 
 /* intro: everything that streams in starts dark */
 .term:not(.term--ready)
-  :is(.term-top, .term-band, .term-band__label, .term-hero__aside, .term-status, .term-codex, .term-motto, .term-seal, .term-rail [data-intro], .card):not(.is-in) {
+  :is(.term-top, .term-band, .term-band__label, .term-hero__aside, .term-status, .term-codex, .term-rail [data-intro], .card):not(.is-in) {
   opacity: 0;
 }
 
-.term--intro :is(.term-top, .term-band__label, .term-hero__aside, .term-codex, .term-motto, .term-rail [data-intro]).is-in {
+.term--intro :is(.term-top, .term-band__label, .term-hero__aside, .term-codex, .term-rail [data-intro]).is-in {
   animation: flk-in 0.5s steps(1, end) both;
 }
 
-/* ── header: a riveted gunmetal plate with a crimson trim line ── */
+/* ── header: a flat readout bar over a crimson rule ── */
 .term-top {
   position: sticky;
   top: 0;
@@ -50,8 +50,8 @@
   min-height: var(--top-h);
   margin: 0 calc(-1 * var(--gutter));
   padding: 8px var(--gutter);
-  background: linear-gradient(180deg, #16171b, #0e0f12);
-  box-shadow: 0 1px 0 var(--t-line), 0 3px 0 rgb(var(--t-red-rgb) / 0.55), 0 14px 30px -12px rgb(0 0 0 / 0.9);
+  background: var(--t-panel);
+  box-shadow: 0 1px 0 var(--t-line), 0 3px 0 rgb(var(--t-red-rgb) / 0.5);
 }
 
 .term-top::after {
@@ -110,13 +110,13 @@
 }
 
 .term-brand__name {
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: clamp(15px, 1.5vw, 19px);
-  letter-spacing: 0.16em;
-  line-height: 1.1;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2vw, 28px);
+  letter-spacing: 0.08em;
+  line-height: 0.95;
   white-space: nowrap;
   color: var(--t-fg-hi);
+  text-shadow: var(--t-glow-hi);
 }
 
 .term-brand__sub {
@@ -198,13 +198,13 @@
   text-shadow: none;
 }
 
-/* ── hero: the objectives banner ── */
+/* ── hero: the objectives readout ── */
 .term-hero {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) minmax(0, 860px) minmax(140px, 1fr);
+  grid-template-columns: minmax(150px, 1fr) minmax(0, 760px) minmax(150px, 1fr);
   align-items: center;
   gap: clamp(16px, 2.4vw, 36px);
-  padding: clamp(40px, 7vh, 76px) 0 clamp(44px, 6vh, 64px);
+  padding: clamp(24px, 4vh, 40px) 0 clamp(22px, 3.5vh, 34px);
 }
 
 .term-hero__aside--left {
@@ -237,8 +237,8 @@
 
 .term-band-wrap {
   position: relative;
-  padding-top: 18px;
-  filter: drop-shadow(0 0 22px rgb(var(--t-red-rgb) / 0.22)) drop-shadow(0 18px 24px rgb(0 0 0 / 0.6));
+  padding-top: 16px;
+  filter: drop-shadow(0 0 14px rgb(var(--t-red-rgb) / 0.35));
 }
 
 .term-band__label {
@@ -247,38 +247,32 @@
   left: 50%;
   z-index: 2;
   transform: translateX(-50%);
-  padding: 5px 20px 4px;
-  border: 1px solid var(--t-fg);
-  background: linear-gradient(180deg, #1b1c20, #0f1013);
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: clamp(11px, 1.1vw, 14px);
+  padding: 0 14px;
+  border: 1px solid var(--t-red-hi);
+  background: var(--t-bg);
+  font-family: var(--font-display);
+  font-size: clamp(19px, 1.8vw, 24px);
   line-height: 1.2;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.08em;
   white-space: nowrap;
   color: var(--t-fg-hi);
-  text-shadow: none;
-  box-shadow: 0 0 0 3px #0b0b0d, 0 0 0 4px rgb(var(--t-fg-rgb) / 0.3);
+  text-shadow: var(--t-glow-hi);
+  box-shadow: 0 0 10px rgb(var(--t-red-rgb) / 0.35);
 }
 
-/* a crimson banner with notched ends, worn like old enamel */
+/* the inverted band: dark text burned into a bright crimson bar, worn at the edges */
 .term-band {
   position: relative;
-  padding: clamp(28px, 3vw, 38px) clamp(36px, 5vw, 64px) clamp(16px, 2vw, 24px);
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 0.09), transparent 18%, transparent 82%, rgb(0 0 0 / 0.25)),
-    linear-gradient(90deg, #7e0d12 0%, #b3141b 18%, #c4171e 50%, #b3141b 82%, #7e0d12 100%);
-  color: var(--t-ivory);
+  padding: clamp(24px, 2.6vw, 30px) clamp(16px, 3vw, 36px) clamp(10px, 1.4vw, 16px);
+  background: radial-gradient(90% 160% at 50% 50%, #ff3a30 0%, #e3262d 55%, #c01a20 100%);
+  color: #170405;
   text-align: center;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 18px) 50%, 100% 100%, 0 100%, 18px 50%);
+  clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
 .term-band::before,
 .term-band::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+  background: repeating-linear-gradient(180deg, transparent 0 2px, rgb(30 0 0 / 0.16) 2px 3px);
 }
 
 .term-band::before {
@@ -298,18 +292,14 @@
   position: relative;
   z-index: 1;
   margin: 0;
-  font-family: var(--font-gothic);
-  font-weight: 600;
-  font-size: clamp(16px, 2.1vw, 28px);
-  line-height: 1.3;
-  letter-spacing: 0.08em;
-  min-height: 1.3em;
-  text-shadow: 0 1px 0 rgb(0 0 0 / 0.45);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.5vw, 32px);
+  line-height: 1.08;
+  letter-spacing: 0.06em;
+  min-height: 1.08em;
+  text-shadow: 0 0 1px rgb(23 4 5 / 0.5);
 }
 
-.term-band__line b {
-  font-weight: 800;
-}
 
 .term--intro .term-band.is-in {
   animation: band-bloom 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -322,41 +312,10 @@
 }
 
 /* a wax purity seal pressed onto the banner's lower edge */
-.term-seal {
-  position: absolute;
-  left: clamp(14px, 5%, 48px);
-  top: calc(100% - 92px);
-  z-index: 3;
-  width: 54px;
-  pointer-events: none;
-  transform: rotate(-8deg);
-  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.6));
-}
 
-.term-seal svg {
-  width: 100%;
-  height: auto;
-}
 
-.term--intro .term-seal.is-in {
-  animation: seal-press 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
-}
 
-@keyframes seal-press {
-  from { opacity: 0; transform: rotate(-8deg) scale(1.6); }
-  to { opacity: 1; transform: rotate(-8deg) scale(1); }
-}
 
-.term-motto {
-  margin: 18px 0 0;
-  text-align: center;
-  font-family: var(--font-gothic);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5em;
-  color: var(--t-fg-dim);
-  text-shadow: none;
-}
 
 .term-meta {
   display: grid;
@@ -413,11 +372,9 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 6px;
-  font-family: var(--font-gothic);
-  font-weight: 700;
   font-size: 11px;
-  letter-spacing: 0.26em;
-  color: var(--t-fg-hi);
+  letter-spacing: 0.22em;
+  color: var(--t-fg-dim);
   text-shadow: none;
 }
 
@@ -598,7 +555,7 @@
   }
 }
 
-/* ── product card: a riveted plate around a window onto the 3D canvas ── */
+/* ── product card: a screen panel around a window onto the 3D canvas ── */
 .card {
   position: relative;
   display: flex;
@@ -629,22 +586,14 @@
   animation: flk-in 0.45s steps(1, end) both;
 }
 
-.rivets {
-  background-image:
-    radial-gradient(circle at 7px 50%, #9aa0a8 0 1.6px, #3c3f45 2.2px, transparent 2.8px),
-    radial-gradient(circle at calc(100% - 7px) 50%, #9aa0a8 0 1.6px, #3c3f45 2.2px, transparent 2.8px);
-}
 
 .card__head {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 18px;
-  border-bottom: 1px solid var(--t-line-dim);
-  background:
-    radial-gradient(circle at 7px 50%, #9aa0a8 0 1.4px, #3c3f45 2px, transparent 2.6px),
-    radial-gradient(circle at calc(100% - 7px) 50%, #9aa0a8 0 1.4px, #3c3f45 2px, transparent 2.6px),
-    linear-gradient(180deg, #1a1b1f, #111215);
+  padding: 8px 10px;
+  border-bottom: 1px dashed var(--t-line-dim);
+  background: rgb(13 13 15 / 0.92);
   font-size: 11px;
   letter-spacing: 0.14em;
 }
@@ -786,10 +735,8 @@
   position: absolute;
   top: 14px;
   left: 26px;
-  font-family: var(--font-gothic);
-  font-weight: 700;
   font-size: 10.5px;
-  letter-spacing: 0.26em;
+  letter-spacing: 0.2em;
   color: var(--t-red-hi);
   text-shadow: var(--t-glow-red);
   pointer-events: none;
@@ -797,27 +744,26 @@
 
 .card__body {
   flex: 1;
-  padding: 14px 14px 12px;
-  border-top: 1px solid var(--t-line-dim);
-  background: linear-gradient(180deg, rgb(17 18 21 / 0.94), rgb(12 12 14 / 0.94));
+  padding: 12px 12px 10px;
+  border-top: 1px dashed var(--t-line-dim);
+  background: rgb(13 13 15 / 0.92);
 }
 
 .card__name {
   margin: 0;
-  min-height: 2.5em;
-  font-family: var(--font-gothic);
-  font-size: clamp(16px, 1.35vw, 19px);
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: 0.06em;
+  min-height: 2.1em;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 1.9vw, 27px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
   color: var(--t-fg-hi);
   text-shadow: var(--t-glow-hi);
-  text-wrap: balance;
 }
 
 .card--featured .card__name {
   min-height: 0;
-  font-size: clamp(20px, 2vw, 26px);
+  font-size: clamp(26px, 2.6vw, 34px);
 }
 
 .card__desc {
@@ -847,7 +793,7 @@
 
 .card__specs div {
   padding: 4px 6px;
-  border-left: 1px solid rgb(var(--t-red-rgb) / 0.4);
+  border-left: 1px solid var(--t-line-dim);
   min-width: 0;
 }
 
@@ -870,9 +816,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 10px 12px;
   border-top: 1px solid var(--t-line-dim);
-  background: linear-gradient(180deg, #121316, #0d0e10);
+  background: rgb(13 13 15 / 0.95);
 }
 
 .card__price {
@@ -882,11 +828,11 @@
 }
 
 .card__price b {
-  font-family: var(--font-gothic);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
   color: var(--t-fg-hi);
+  text-shadow: var(--t-glow-hi);
 }
 
 .card__price small {
@@ -935,17 +881,17 @@
 }
 
 .tbtn--primary {
-  background: linear-gradient(180deg, #d81f26, #a5131a);
-  border-color: #e3373d;
-  color: var(--t-ivory);
-  text-shadow: 0 1px 0 rgb(0 0 0 / 0.4);
-  box-shadow: 0 0 18px rgb(var(--t-red-rgb) / 0.28);
+  background: var(--t-red);
+  border-color: var(--t-red-hi);
+  color: #170405;
+  text-shadow: none;
+  box-shadow: 0 0 16px rgb(var(--t-red-rgb) / 0.35);
 }
 
 .tbtn--primary:hover {
-  background: linear-gradient(180deg, #ee2b31, #c4171e);
-  border-color: #ff5a55;
-  color: #fff;
+  background: var(--t-red-hi);
+  border-color: #ff7a6e;
+  color: #170405;
 }
 
 .tbtn.is-active {
@@ -1001,13 +947,13 @@
 }
 
 .term-codex h2 {
-  margin: 0 0 10px;
-  font-family: var(--font-gothic);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.24em;
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   color: var(--t-fg-hi);
-  text-shadow: none;
+  text-shadow: var(--t-glow-hi);
 }
 
 .term-codex p {
@@ -1028,7 +974,7 @@
   gap: clamp(10px, 2vw, 24px);
   margin: auto calc(-1 * var(--gutter)) 0;
   padding: 8px var(--gutter);
-  background: linear-gradient(180deg, #121316, #0c0d0f);
+  background: var(--t-panel);
   box-shadow: 0 -1px 0 var(--t-line), 0 -3px 0 rgb(var(--t-red-rgb) / 0.45);
   font-size: 11.5px;
   letter-spacing: 0.14em;
@@ -1098,7 +1044,7 @@
   }
 
   .term-band-wrap {
-    width: min(100%, 900px);
+    width: min(100%, 820px);
     justify-self: center;
   }
 
@@ -1115,7 +1061,7 @@
     grid-template-columns: repeat(4, auto);
     justify-content: space-between;
     gap: 6px 20px;
-    margin-top: 28px;
+    margin-top: 6px;
   }
 
   .term-meta div {
@@ -1175,27 +1121,16 @@
   }
 
   .term-brand__name {
-    font-size: 14px;
-    letter-spacing: 0.12em;
+    font-size: 21px;
+    letter-spacing: 0.06em;
   }
 
   .term-cartbtn > span {
     display: none;
   }
 
-  .term-band {
-    padding-inline: 30px;
-  }
 
-  .term-seal {
-    width: 46px;
-    bottom: -38px;
-  }
 
-  .term-motto {
-    margin-top: 42px;
-    letter-spacing: 0.3em;
-  }
 
   .term-meta {
     grid-template-columns: 1fr 1fr;
