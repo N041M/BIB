@@ -1,0 +1,278 @@
+/* ───────────────── The cogitator screen layer ───────────────── */
+
+.screen {
+  --grain: 0.06;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--t-phos);
+  font-family: var(--font-mono);
+  background: var(--t-void);
+  transform-origin: 50% 50%;
+}
+
+.screen ::selection {
+  background: var(--t-phos);
+  color: #0a1606;
+}
+
+.screen__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: opacity 1s ease;
+}
+
+.screen__bg--store {
+  background:
+    radial-gradient(70% 55% at 50% 0%, rgba(120, 200, 80, 0.07), transparent 70%),
+    radial-gradient(120% 90% at 50% 40%, #08170e 0%, #050e09 55%, #020504 100%);
+}
+
+.screen__bg--boot {
+  opacity: 0;
+  background:
+    radial-gradient(60% 50% at 50% 48%, rgba(70, 150, 120, 0.22), transparent 70%),
+    radial-gradient(110% 90% at 50% 50%, #123334 0%, #0b2223 45%, #041011 100%);
+}
+
+.screen[data-phase='off'] .screen__bg--boot,
+.screen[data-phase='ignite'] .screen__bg--boot,
+.screen[data-phase='hud'] .screen__bg--boot {
+  opacity: 1;
+}
+
+.screen[data-phase='off'] {
+  --grain: 0.55;
+}
+.screen[data-phase='ignite'] {
+  --grain: 0.4;
+}
+.screen[data-phase='hud'] {
+  --grain: 0.26;
+}
+.screen[data-phase='clear'] {
+  --grain: 0.12;
+}
+
+.gl-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: filter 0.8s ease;
+}
+
+.screen[data-phase='hud'] .gl-canvas {
+  filter: blur(1.4px) contrast(1.2);
+}
+
+.screen__hero {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.screen__scroll {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--t-phos-dim) transparent;
+}
+
+.screen__scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.screen__scroll::-webkit-scrollbar-thumb {
+  background: var(--t-phos-dim);
+}
+
+.screen:not([data-phase='store']) .screen__scroll {
+  visibility: hidden;
+}
+
+/* ── CRT treatment over everything on the glass ── */
+.screen__crt {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.screen__crt > i {
+  position: absolute;
+  inset: 0;
+}
+
+.screen__grain {
+  inset: -50% !important;
+  opacity: var(--grain);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .72  0 0 0 0 .96  0 0 0 0 .55  0 0 0 2.2 -1.1'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation: grain 0.5s steps(5) infinite;
+  transition: opacity 0.8s ease;
+}
+
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4%, 3%); }
+  40% { transform: translate(3%, -6%); }
+  60% { transform: translate(-7%, -2%); }
+  80% { transform: translate(5%, 5%); }
+  100% { transform: translate(0, 0); }
+}
+
+.screen__lines {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.22) 3px
+  );
+}
+
+/* a faint bright band drifting down the tube (transform-only, stays on the compositor) */
+.screen__roll {
+  inset: auto 0 auto 0 !important;
+  top: 0 !important;
+  height: 38%;
+  background: linear-gradient(180deg, transparent 0%, rgba(180, 238, 92, 0.03) 60%, rgba(180, 238, 92, 0.06) 82%, transparent 100%);
+  animation: roll 9s linear infinite;
+  will-change: transform;
+}
+
+@keyframes roll {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(265%); }
+}
+
+.screen__vignette {
+  background:
+    radial-gradient(130% 110% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.55) 88%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+/* power-on flash: a hot line that blooms into the whole glass */
+.screen__flash {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(60% 50% at 50% 50%, #f4ffd8, #c4f07a 60%, #6aa83a);
+  transform: scaleY(0.004);
+}
+
+.screen[data-phase='ignite'] .screen__flash {
+  animation: ignite 0.42s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+
+@keyframes ignite {
+  0% { opacity: 1; transform: scale(0.15, 0.004); }
+  40% { opacity: 1; transform: scale(1, 0.006); }
+  62% { opacity: 0.45; transform: scale(1, 1); }
+  100% { opacity: 0; transform: scale(1, 1); }
+}
+
+.screen[data-phase='off'] .screen__crt {
+  animation: static-burst 0.12s steps(2) infinite;
+}
+
+@keyframes static-burst {
+  0% { filter: brightness(1.3); }
+  50% { filter: brightness(0.7); }
+}
+
+/* the glass collapses to a line, then a point, like an old tube switching off */
+.screen--off {
+  animation: crt-off 0.62s cubic-bezier(0.6, 0, 0.4, 1) forwards;
+}
+
+@keyframes crt-off {
+  0% { transform: none; filter: brightness(1); }
+  45% { transform: scale(1, 0.005); filter: brightness(3.5) saturate(0.4); }
+  75% { transform: scale(0.003, 0.005); filter: brightness(6); }
+  100% { transform: scale(0, 0); opacity: 0; }
+}
+
+.screen__skip {
+  position: absolute;
+  right: clamp(12px, 3vw, 32px);
+  bottom: clamp(12px, 3vh, 28px);
+  z-index: 50;
+  padding: 8px 14px;
+  border: 1px solid var(--t-line);
+  background: rgba(2, 8, 5, 0.6);
+  color: var(--t-phos);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease 0.6s, background 0.2s ease;
+}
+
+.screen.is-booting .screen__skip {
+  opacity: 0.75;
+  pointer-events: auto;
+}
+
+.screen__skip:hover {
+  opacity: 1;
+  background: rgba(180, 238, 92, 0.12);
+}
+
+.screen kbd {
+  font-family: inherit;
+  font-size: 0.85em;
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+}
+
+/* generic flicker used by the HUD and the terminal intro */
+@keyframes flk-in {
+  0% { opacity: 0; }
+  8% { opacity: 0.9; }
+  14% { opacity: 0; }
+  30% { opacity: 0; }
+  34% { opacity: 1; }
+  46% { opacity: 0.25; }
+  52% { opacity: 1; }
+  76% { opacity: 0.6; }
+  80% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes flk-out {
+  0% { opacity: 1; }
+  20% { opacity: 0.15; }
+  30% { opacity: 1; }
+  55% { opacity: 0; }
+  62% { opacity: 0.8; }
+  70% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen__grain,
+  .screen__roll {
+    animation: none;
+  }
+
+  .screen *,
+  .screen *::before,
+  .screen *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
