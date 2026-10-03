@@ -298,6 +298,14 @@
 }
 
 /* ── body: rail + grid ── */
+.term-hero,
+.term-body,
+.term-codex {
+  width: 100%;
+  max-width: 1720px;
+  margin-inline: auto;
+}
+
 .term-body {
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
@@ -423,20 +431,63 @@
   letter-spacing: 0.18em;
 }
 
+/* explicit 1 → 2 → 3 column steps so the full archive always fills its rows:
+   2 cols: featured spans both (10 slots); 3 cols: featured spans two and the
+   last pattern becomes a full-width banner (3 + 3 + 3 + 1 wide). */
 .term-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr));
-  grid-auto-flow: dense;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 
 @container (min-width: 600px) {
+  .term-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .term:not(.term--filtered) .card--featured {
     grid-column: span 2;
   }
 
   .term:not(.term--filtered) .card--featured .card__view {
     aspect-ratio: 16 / 7;
+  }
+}
+
+@container (min-width: 940px) {
+  .term-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .term:not(.term--filtered) .card:last-child:not(.card--featured) {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .term:not(.term--filtered) .card:last-child:not(.card--featured) .card__head {
+    grid-column: 1 / -1;
+  }
+
+  .term:not(.term--filtered) .card:last-child:not(.card--featured) .card__view {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    aspect-ratio: 16 / 7;
+    border-right: 1px dashed var(--t-line-dim);
+  }
+
+  .term:not(.term--filtered) .card:last-child:not(.card--featured) .card__body {
+    grid-column: 2;
+    border-top: 0;
+  }
+
+  .term:not(.term--filtered) .card:last-child:not(.card--featured) .card__more {
+    display: block;
+  }
+
+  .term:not(.term--filtered) .card:last-child:not(.card--featured) .card__foot {
+    grid-column: 2;
   }
 }
 
@@ -630,6 +681,15 @@
   line-height: 1.5;
   letter-spacing: 0.02em;
   color: rgba(180, 238, 92, 0.72);
+  text-shadow: none;
+}
+
+.card__more {
+  display: none;
+  margin: 0 0 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(180, 238, 92, 0.55);
   text-shadow: none;
 }
 

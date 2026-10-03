@@ -159,6 +159,7 @@ export class ProductCard {
   <div class="card__body">
     <h3 class="card__name">${esc(p.name.toUpperCase())}</h3>
     <p class="card__desc">${esc(p.short)}</p>
+    <p class="card__more">${esc(p.description)}</p>
     <dl class="card__specs">
       <div><dt>TRIS</dt><dd data-spec="tris">—</dd></div>
       <div><dt>PARTS</dt><dd>${p.parts}</dd></div>

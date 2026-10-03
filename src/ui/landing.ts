@@ -38,12 +38,14 @@ export class Landing {
     this.el.hidden = false;
     this.el.classList.remove('lp--leaving', 'lp--gone');
     this.screen.classList.remove('display--waking');
-    document.documentElement.classList.remove('is-terminal');
+    document.documentElement.classList.remove('is-terminal', 'is-dimmed');
   }
 
   /** Fade the page out underneath the expanding screen. */
   leave(): void {
     this.el.classList.add('lp--leaving');
+    // the room goes dark around the waking screen
+    document.documentElement.classList.add('is-dimmed');
   }
 
   hide(): void {

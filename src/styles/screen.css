@@ -10,6 +10,7 @@
   color: var(--t-phos);
   font-family: var(--font-mono);
   background: var(--t-void);
+  color-scheme: dark;
   transform-origin: 50% 50%;
 }
 

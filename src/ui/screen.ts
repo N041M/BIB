@@ -88,13 +88,15 @@ export class Screen {
   async boot(origin: DOMRect, onExpanded: () => void): Promise<void> {
     const seq = (this.seq = new Sequence());
     const reduced = prefersReducedMotion();
+    const clip = this.clipper(origin);
+    clip(0);
+    this.setPhase('off');
     this.show();
     this.renderer.start();
     this.store.activate();
-    this.setPhase('off');
 
     if (reduced) {
-      await this.expand(origin, seq, 1);
+      clip(1);
       onExpanded();
       this.setPhase('store');
       this.store.finishIntro();
@@ -107,24 +109,28 @@ export class Screen {
     this.prepareHero();
     hud.mount(this.el);
 
-    // 1 — the glass grows to fill the page while the landing fades out beneath it
-    await this.expand(origin, seq, 720);
-    onExpanded();
-
-    // 2 — power-on: a hot line blooms into a full flash
+    // 1 — the monitor's glass powers on in place: a hot line blooms into a flash
     this.setPhase('ignite');
-    await seq.wait(260);
+    await seq.wait(240);
 
-    // 3 — the visor HUD flickers in over a teal, noisy screen
+    // 2 — the glass grows to fill the page while the landing fades out beneath it,
+    //     and the visor details flicker in as it grows
+    this.setPhase('hud');
+    const expanded = tween(900, clip, easeInOutCubic, seq);
+    await seq.wait(160);
+    const flicker = hud.flickerIn(seq, 1200);
+    await seq.wait(140);
+    this.showHero();
+    await expanded;
+    this.el.style.clipPath = 'none';
+    onExpanded();
+    await flicker;
+
+    // 3 — the HUD runs for a beat, then locks on
     if (!seq.skipped) {
-      this.setPhase('hud');
-      const flicker = hud.flickerIn(seq, 1100);
-      await seq.wait(120);
-      this.showHero();
-      await flicker;
-      await seq.wait(900);
+      await seq.wait(800);
       if (!seq.skipped) await hud.lock(seq);
-      await seq.wait(520);
+      await seq.wait(560);
     }
 
     // 4 — the image clears: HUD tears away, noise and teal drain out
@@ -217,24 +223,19 @@ export class Screen {
     this.el.dataset.phase = phase;
   }
 
-  private expand(origin: DOMRect, seq: Sequence, ms: number): Promise<void> {
+  /** Returns a setter that clips the screen between the monitor glass (0) and the full viewport (1). */
+  private clipper(origin: DOMRect): (k: number) => void {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const from = {
-      t: origin.top,
-      r: vw - origin.right,
-      b: vh - origin.bottom,
-      l: origin.left,
-      rad: 12,
-    };
-    const apply = (k: number) => {
+    const from = { t: origin.top, r: vw - origin.right, b: vh - origin.bottom, l: origin.left, rad: 12 };
+    return (k: number) => {
+      if (k >= 1) {
+        this.el.style.clipPath = 'none';
+        return;
+      }
       const i = (v: number) => (v * (1 - k)).toFixed(2);
       this.el.style.clipPath = `inset(${i(from.t)}px ${i(from.r)}px ${i(from.b)}px ${i(from.l)}px round ${i(from.rad)}px)`;
     };
-    apply(0);
-    return tween(ms, apply, easeInOutCubic, seq).then(() => {
-      this.el.style.clipPath = 'none';
-    });
   }
 
   /** A huge, ghostly wireframe of the flagship pattern behind the visor HUD. */
