@@ -136,10 +136,10 @@ export class App {
         ? `${BRAND.name} · Licensed STL models`
         : product
           ? `${product.name.toUpperCase()} // ${BRAND.terminalName}`
-          : BRAND.terminalName;
+          : `${BRAND.terminalName} // ${BRAND.terminalSub}`;
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', route.name === 'landing' ? '#f4f3ef' : '#030906');
+      ?.setAttribute('content', route.name === 'landing' ? '#111215' : '#0b0b0d');
   }
 
   private async powerDown(): Promise<void> {

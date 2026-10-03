@@ -1,37 +1,59 @@
 :root {
+  /* shared palette: crimson, silver, gunmetal */
+  --red: #c8161e;
+  --red-hi: #e3262d;
+  --red-glow: #ff4a3d;
+  --red-deep: #6e0c10;
+  --silver-hi: #f2f3f5;
+  --silver: #c9cdd3;
+  --silver-dim: #8c9199;
+  --steel: #4a4d54;
+
   /* ordinary landing page */
-  --lp-bg: #f4f3ef;
-  --lp-surface: #ffffff;
-  --lp-ink: #141413;
-  --lp-ink-2: #3d3d3a;
-  --lp-muted: #6c6b66;
-  --lp-line: #e2e0d9;
-  --lp-accent: #2f6b4f;
-  --lp-radius: 14px;
-  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --lp-bg: #111215;
+  --lp-bg-2: #0c0d0f;
+  --lp-surface: #17181c;
+  --lp-surface-2: #1d1f24;
+  --lp-line: #2a2c32;
+  --lp-line-2: #3b3e45;
+  --lp-ink: #eceef1;
+  --lp-ink-2: #c3c7cd;
+  --lp-muted: #8d929a;
+  --lp-accent: var(--red-hi);
+  --lp-radius: 4px;
 
   /* cogitator terminal */
-  --t-void: #020504;
-  --t-bg: #040c08;
-  --t-bg-2: #07130d;
-  --t-teal: #0a1b1d;
-  --t-phos: #b4ee5c;
-  --t-phos-hi: #e6ffa8;
-  --t-phos-mid: #86c64a;
-  --t-phos-dim: #4b7a2e;
-  --t-phos-deep: #1b3317;
-  --t-line: rgba(180, 238, 92, 0.32);
-  --t-line-dim: rgba(180, 238, 92, 0.14);
-  --t-wash: rgba(180, 238, 92, 0.045);
-  --t-alert: #ff6a3d;
-  --t-alert-dim: rgba(255, 106, 61, 0.35);
-  --t-glow: 0 0 5px rgba(180, 238, 92, 0.55), 0 0 16px rgba(180, 238, 92, 0.16);
-  --t-glow-alert: 0 0 5px rgba(255, 106, 61, 0.6), 0 0 14px rgba(255, 106, 61, 0.2);
+  --t-void: #060607;
+  --t-bg: #0b0b0d;
+  --t-panel: #0f1013;
+  --t-panel-2: #15161a;
+  --t-fg-rgb: 205 209 215;
+  --t-red-rgb: 226 36 42;
+  --t-fg: rgb(var(--t-fg-rgb));
+  --t-fg-hi: var(--silver-hi);
+  --t-fg-dim: var(--silver-dim);
+  --t-red: rgb(var(--t-red-rgb));
+  --t-red-hi: var(--red-glow);
+  --t-red-deep: #7d0e13;
+  --t-ivory: #f3eee6;
+  --t-line: rgb(var(--t-fg-rgb) / 0.24);
+  --t-line-dim: rgb(var(--t-fg-rgb) / 0.11);
+  --t-wash: rgb(var(--t-fg-rgb) / 0.04);
+  --t-red-line: rgb(var(--t-red-rgb) / 0.55);
+  --t-red-wash: rgb(var(--t-red-rgb) / 0.1);
+  --t-glow: 0 0 4px rgb(var(--t-fg-rgb) / 0.3);
+  --t-glow-hi: 0 0 6px rgb(var(--t-fg-rgb) / 0.45), 0 0 18px rgb(var(--t-fg-rgb) / 0.12);
+  --t-glow-red: 0 0 5px rgb(255 70 60 / 0.6), 0 0 16px rgb(255 50 40 / 0.22);
+
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-gothic: 'Cinzel Variable', 'Cinzel', 'Trajan Pro', 'Times New Roman', Georgia, serif;
   --font-display: 'VT323', ui-monospace, monospace;
   --font-mono: 'Share Tech Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+
+  color-scheme: dark;
 }
 
 *,

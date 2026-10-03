@@ -88,7 +88,7 @@ export class CartDrawer {
     const ref = `A-${Math.floor(1000 + Math.random() * 9000)}`;
     const total = formatMoney(cart.total);
     this.el.classList.add('is-transmitting');
-    log.replaceChildren();
+    log.replaceChildren(h('p', { class: 'is-dim' }, '+++ TRANSMISSION BEGINS +++'));
     const steps = [
       'ENCRYPTING MANIFEST',
       'CONSULTING LICENCE CODEX',
@@ -105,7 +105,7 @@ export class CartDrawer {
       qs(row, 'b').textContent = ' OK';
     }
     await seq.wait(200);
-    log.append(h('p', { class: 'is-hot' }, `> REQUISITION ${ref} ACCEPTED · ${total}`));
+    log.append(h('p', { class: 'is-hot' }, `+++ REQUISITION ${ref} ACCEPTED · ${total} +++`));
     log.append(h('p', { class: 'is-note' }, 'DEMO STOREFRONT: NO PAYMENT WAS TAKEN AND NO FILES WERE SENT.'));
     this.el.classList.add('is-done');
     cart.clear();

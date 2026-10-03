@@ -97,7 +97,7 @@ export class Landing {
     <section class="lp-hero">
       <div class="lp-hero__copy">
         <p class="lp-eyebrow"><span class="lp-eyebrow__dot"></span>Licensed STL files for tabletop</p>
-        <h1 class="lp-title">Print-ready miniatures, licensed for your table.</h1>
+        <h1 class="lp-title lp-engraved">Print-ready miniatures, licensed for your table.</h1>
         <p class="lp-lede">${BRAND.name} is a curated archive of tested STL models: armour, terrain, busts and relics. Every file comes with a clear licence for printing at home, or for selling the prints.</p>
         <div class="lp-hero__cta">
           <button type="button" class="lp-btn lp-btn--dark lp-btn--lg" data-enter>Browse the archive <span aria-hidden="true">→</span></button>
@@ -134,7 +134,7 @@ export class Landing {
     <section class="lp-section" id="how">
       <div class="lp-section__head">
         <p class="lp-kicker">How it works</p>
-        <h2>From checkout to build plate in minutes.</h2>
+        <h2 class="lp-engraved">From checkout to build plate in minutes.</h2>
       </div>
       <div class="lp-features">
         <article class="lp-feature">
@@ -158,7 +158,7 @@ export class Landing {
     <section class="lp-section lp-section--tinted" id="licensing">
       <div class="lp-section__head">
         <p class="lp-kicker">Licensing</p>
-        <h2>Two licences. No fine print.</h2>
+        <h2 class="lp-engraved">Two licences. No fine print.</h2>
       </div>
       <div class="lp-tiers">
         <article class="lp-tier">
@@ -187,7 +187,7 @@ export class Landing {
     <section class="lp-section" id="faq">
       <div class="lp-section__head">
         <p class="lp-kicker">FAQ</p>
-        <h2>Questions, answered.</h2>
+        <h2 class="lp-engraved">Questions, answered.</h2>
       </div>
       <div class="lp-faq">
         <details><summary>What scale are the models?</summary><p>Most models are sized for 28–32 mm tabletop games. Busts and display relics list their own size. STL files scale freely in any slicer.</p></details>

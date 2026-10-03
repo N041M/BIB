@@ -248,7 +248,7 @@ export class Screen {
       elevation: 0.1,
       spin: 0.14,
       edgeOpacity: 0.16,
-      palette: { dark: '#010504', lit: '#0d2723', rim: '#6d9e40' },
+      palette: { dark: '#040404', lit: '#1d1e22', rim: '#b3121a', spec: 0.06, rimStrength: 0.45 },
     });
     stage.hideModel();
     const el = qs(this.el, '.screen__hero');

@@ -1,4 +1,5 @@
 import '@fontsource-variable/inter';
+import '@fontsource-variable/cinzel';
 import '@fontsource/vt323';
 import '@fontsource/share-tech-mono';
 import './styles/base.css';

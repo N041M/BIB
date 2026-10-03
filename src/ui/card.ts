@@ -140,7 +140,7 @@ export class ProductCard {
   private template(): string {
     const p = this.product;
     const cat = CATEGORIES.find((c) => c.id === p.category)?.label ?? '';
-    const tagClass = p.tag === 'FREE' ? 'tag tag--alert' : 'tag';
+    const tagClass = { NEW: 'tag', SANCTIONED: 'tag tag--red', RARE: 'tag tag--outline', FREE: 'tag tag--alert' }[p.tag ?? 'NEW'];
     return /* html */ `
 <article class="card${p.featured ? ' card--featured' : ''}" data-id="${esc(p.id)}" data-cat="${p.category}">
   <header class="card__head">

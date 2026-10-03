@@ -1,10 +1,12 @@
 /** Brand + commerce settings. Change these to re-skin the store. */
 export const BRAND = {
   /** Shown on the ordinary landing page. */
-  name: 'Plinth',
+  name: 'Based in Battle',
+  domain: 'basedinbattle.com',
   /** Shown once the cogitator wakes. */
-  terminalName: 'PLINTH//PATTERN ARCHIVE',
-  nodeId: 'PLN-01',
+  terminalName: 'BASED IN BATTLE',
+  terminalSub: 'PATTERN ARCHIVE',
+  nodeId: 'CGT-07',
   locale: 'en-IE',
   currency: 'EUR',
 } as const;

@@ -16,7 +16,7 @@ export interface StageOptions {
   /** Edge-line opacity in solid mode. */
   edgeOpacity?: number;
   /** Override the phosphor ramp (sRGB hex), e.g. for the dark silhouette behind the HUD. */
-  palette?: { dark: string; lit: string; rim: string } | null;
+  palette?: { dark: string; lit: string; rim: string; spec?: number; rimStrength?: number } | null;
 }
 
 const tmpPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0);
@@ -73,7 +73,7 @@ export class ProductStage {
       fov: 30,
       floor: true,
       spin: 0.32,
-      edgeOpacity: 0.32,
+      edgeOpacity: 0.16,
       palette: null,
       ...options,
     };
@@ -93,6 +93,8 @@ export class ProductStage {
       solidMat.uniforms.uDark.value.set(pal.dark);
       solidMat.uniforms.uLit.value.set(pal.lit);
       solidMat.uniforms.uRim.value.set(pal.rim);
+      if (pal.spec !== undefined) solidMat.uniforms.uSpec.value = pal.spec;
+      if (pal.rimStrength !== undefined) solidMat.uniforms.uRimStrength.value = pal.rimStrength;
     }
     solidMat.polygonOffset = true;
     solidMat.polygonOffsetFactor = 1;
@@ -239,7 +241,7 @@ export class ProductStage {
     // wire mode keeps the solid as a depth-only occluder for hidden-line edges
     this.solid.material.colorWrite = !wire;
     this.xray.visible = this.mode === 'xray';
-    this.edges.material.color.copy(wire ? PHOSPHOR.rim : PHOSPHOR.line);
+    this.edges.material.color.copy(wire ? PHOSPHOR.red : PHOSPHOR.line);
   }
 
   private buildFloor(data: ModelData): void {
@@ -272,7 +274,7 @@ export class ProductStage {
     ticks.push(new THREE.Vector3(0, 0, r * 0.8), new THREE.Vector3(0, 0, r * 1.25));
     floor.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ticks), mat));
 
-    const scanMat = new THREE.LineBasicMaterial({ color: PHOSPHOR.line, transparent: true, opacity: 0.4, depthWrite: false });
+    const scanMat = new THREE.LineBasicMaterial({ color: PHOSPHOR.red, transparent: true, opacity: 0.4, depthWrite: false });
     this.scanRing = new THREE.LineLoop(ring(r), scanMat);
     this.scene.add(this.scanRing);
 

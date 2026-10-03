@@ -20,7 +20,7 @@ export class Inspector {
   readonly el: HTMLElement;
   private renderer?: THREE.WebGLRenderer;
   private controls?: OrbitControls;
-  private stage = new ProductStage({ floor: true, fit: 1.12, elevation: 0.38, edgeOpacity: 0.28 });
+  private stage = new ProductStage({ floor: true, fit: 1.12, elevation: 0.38, edgeOpacity: 0.18 });
   private viewEl: HTMLElement;
   private product?: Product;
   private model?: ModelData;
@@ -333,7 +333,7 @@ export class Inspector {
           <div><dt>FORMAT</dt><dd>STL · BINARY · MM</dd></div>
         </dl>
         <fieldset class="insp__lic">
-          <legend>// SELECT LICENCE</legend>
+          <legend>SELECT LICENCE</legend>
           ${licence('personal')}
           ${licence('merchant')}
         </fieldset>

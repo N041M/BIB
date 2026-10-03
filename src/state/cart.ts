@@ -8,7 +8,7 @@ export interface CartLine {
 
 type Listener = (lines: CartLine[]) => void;
 
-const KEY = 'plinth.cart.v1';
+const KEY = 'basedinbattle.cart.v1';
 
 function load(): CartLine[] {
   try {

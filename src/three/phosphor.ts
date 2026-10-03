@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 
-/** Palette for the cogitator screen, in sRGB hex. */
+/** Palette for the cogitator screen, in sRGB hex: pewter models with a crimson rim light. */
 export const PHOSPHOR = {
-  dark: new THREE.Color('#06140b'),
-  lit: new THREE.Color('#8fd14f'),
-  rim: new THREE.Color('#d4ff7a'),
-  hot: new THREE.Color('#f2ffd0'),
-  line: new THREE.Color('#9be35a'),
-  lineDim: new THREE.Color('#3f6b28'),
+  dark: new THREE.Color('#0d0e11'),
+  lit: new THREE.Color('#a4aab2'),
+  rim: new THREE.Color('#ff2a1f'),
+  hot: new THREE.Color('#ffb3aa'),
+  line: new THREE.Color('#8c9199'),
+  lineDim: new THREE.Color('#4a4d54'),
+  red: new THREE.Color('#e2242a'),
 };
 
 const vertexShader = /* glsl */ `
@@ -36,6 +37,8 @@ const fragmentShader = /* glsl */ `
   uniform float uIntensity;
   uniform float uXray;
   uniform float uScan;
+  uniform float uSpec;
+  uniform float uRimStrength;
   varying vec3 vNormalV;
   varying vec3 vViewPos;
   varying float vH;
@@ -47,17 +50,23 @@ const fragmentShader = /* glsl */ `
     if (!gl_FrontFacing) n = -n;
     vec3 v = normalize(-vViewPos);
 
+    // pewter: a key light, a cool fill, a little sky/ground bias and a tight metallic highlight
     vec3 keyDir = normalize(vec3(0.45, 0.75, 0.55));
     vec3 fillDir = normalize(vec3(-0.75, 0.15, 0.35));
     float key = max(dot(n, keyDir), 0.0);
     float fill = max(dot(n, fillDir), 0.0);
-    float shade = key * 0.88 + fill * 0.22 + 0.07;
-    // light posterisation: the phosphor bands a little, like an old tube
-    shade = mix(shade, floor(shade * 5.0 + 0.5) / 5.0, 0.35);
+    float hemi = 0.5 + 0.5 * n.y;
+    float shade = key * 0.72 + fill * 0.16 + hemi * 0.2;
+    // light posterisation: the tube bands the image a little
+    shade = mix(shade, floor(shade * 6.0 + 0.5) / 6.0, 0.25);
 
-    float fres = pow(1.0 - clamp(dot(n, v), 0.0, 1.0), 2.6);
-    vec3 col = mix(uDark, uLit, clamp(shade, 0.0, 1.15));
-    col += uRim * fres * (0.45 + 0.55 * uHover);
+    vec3 halfDir = normalize(keyDir + v);
+    float spec = pow(max(dot(n, halfDir), 0.0), 42.0);
+    float fres = pow(1.0 - clamp(dot(n, v), 0.0, 1.0), 3.6);
+    vec3 col = mix(uDark, uLit, clamp(shade, 0.0, 1.1));
+    col += vec3(0.85, 0.87, 0.9) * spec * uSpec;
+    // crimson rim light, only at grazing angles
+    col += uRim * fres * uRimStrength * (0.5 + 0.9 * uHover);
 
     float scan = 1.0 - uScan * (0.5 + 0.5 * sin(gl_FragCoord.y * 1.35 - uTime * 5.0));
     col *= scan;
@@ -97,6 +106,8 @@ export type PhosphorMaterial = THREE.ShaderMaterial & {
     uIntensity: { value: number };
     uXray: { value: number };
     uScan: { value: number };
+    uSpec: { value: number };
+    uRimStrength: { value: number };
     uMinY: { value: number };
     uMaxY: { value: number };
   };
@@ -122,6 +133,8 @@ export function createPhosphorMaterial(opts: PhosphorOptions = {}): PhosphorMate
       uIntensity: { value: 1 },
       uXray: { value: xray ? 1 : 0 },
       uScan: { value: 0.1 },
+      uSpec: { value: 0.5 },
+      uRimStrength: { value: 0.8 },
       uMinY: { value: opts.minY ?? 0 },
       uMaxY: { value: opts.maxY ?? 1 },
     },

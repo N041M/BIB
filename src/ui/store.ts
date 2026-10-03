@@ -2,7 +2,7 @@ import { BRAND, LICENCES } from '../config';
 import { CATEGORIES, PRODUCTS, type CategoryId, type Product } from '../data/catalog';
 import { fromHTML, qs, qsa } from '../lib/dom';
 import { archiveDate, clock, formatMoney, pad } from '../lib/format';
-import { CATEGORY_GLYPH, sigil, skull } from '../lib/glyphs';
+import { CATEGORY_GLYPH, puritySeal, sigil, skull } from '../lib/glyphs';
 import { scramble, settle } from '../lib/scramble';
 import type { Sequence } from '../lib/sequence';
 import { cart } from '../state/cart';
@@ -74,6 +74,7 @@ export class Store {
 
     step('.term-top');
     this.type('.term-brand__name', 380);
+    this.type('.term-brand__sub', 360, 160);
     this.type('.term-top__params span', 420, 120);
     this.type('.term-date', 300, 200);
     await seq.wait(260);
@@ -86,6 +87,9 @@ export class Store {
     this.type('.term-band__line[data-line="1"]', 560);
     await seq.wait(200);
     this.type('.term-band__line[data-line="2"]', 520);
+    await seq.wait(260);
+    step('.term-seal');
+    step('.term-motto');
     step('.term-hero__aside');
     qsa(this.el, '.term-meta dd').forEach((dd, i) => this.typeEl(dd, 360, 120 + i * 90));
     await seq.wait(320);
@@ -118,7 +122,7 @@ export class Store {
 
   /** Snap to the finished state (skip, reduced motion, or direct deep link). */
   finishIntro(): void {
-    qsa(this.el, '.term-top, .term-band, .term-band__label, .term-hero__aside, .term-status, .term-codex, .term-rail [data-intro]').forEach(
+    qsa(this.el, '.term-top, .term-band, .term-band__label, .term-hero__aside, .term-status, .term-codex, .term-seal, .term-motto, .term-rail [data-intro]').forEach(
       (el) => el.classList.add('is-in'),
     );
     this.texts.forEach((text, el) => {
@@ -199,7 +203,10 @@ export class Store {
   <header class="term-top">
     <button type="button" class="term-brand" data-action="power" title="Power down the cogitator">
       ${sigil('term-brand__sigil')}
-      <span class="term-brand__name" data-typed="${BRAND.terminalName}">${BRAND.terminalName}</span>
+      <span class="term-brand__text">
+        <span class="term-brand__name" data-typed="${BRAND.terminalName}">${BRAND.terminalName}</span>
+        <span class="term-brand__sub" data-typed="${BRAND.terminalSub}">${BRAND.terminalSub}</span>
+      </span>
     </button>
     <div class="term-top__params"><span data-typed="ARCHIVE PARAMETERS">ARCHIVE PARAMETERS</span></div>
     <div class="term-top__meta">
@@ -218,11 +225,13 @@ export class Store {
     </div>
 
     <div class="term-band-wrap">
-      <div class="term-band__label"><span data-typed="REQUISITION OBJECTIVES:">REQUISITION OBJECTIVES:</span></div>
+      <div class="term-band__label"><span data-typed="REQUISITION OBJECTIVES">REQUISITION OBJECTIVES</span></div>
       <div class="term-band">
         <p class="term-band__line" data-line="1" data-typed="PRIMUS — ACQUIRE SANCTIONED PATTERNS">PRIMUS — ACQUIRE SANCTIONED PATTERNS</p>
-        <p class="term-band__line" data-line="2" data-typed="SECUNDUS — PRINT. PAINT. DEPLOY.">SECUNDUS — PRINT. PAINT. DEPLOY.</p>
+        <p class="term-band__line" data-line="2" data-typed="SECUNDUS — PRINT. PAINT. TAKE THE FIELD.">SECUNDUS — PRINT. PAINT. TAKE THE FIELD.</p>
       </div>
+      <div class="term-seal">${puritySeal()}</div>
+      <p class="term-motto">SCIENTIA · FIDES · VICTORIA</p>
     </div>
 
     <div class="term-hero__aside term-hero__aside--right">
@@ -237,15 +246,15 @@ export class Store {
 
   <div class="term-body">
     <nav class="term-rail" aria-label="Pattern classification">
-      <p class="term-rail__head" data-intro>// CLASSIFICATION</p>
+      <p class="term-rail__head" data-intro>${skull()} CLASSIFICATION</p>
       <div class="term-filters">${filters}</div>
       <div class="term-rail__panel" data-intro>
-        <p class="term-rail__head">// LICENCE TIERS</p>
+        <p class="term-rail__head">${skull()} LICENCE TIERS</p>
         <p><b>${LICENCES.personal.terminalLabel}</b> — ${LICENCES.personal.summary}</p>
         <p><b>${LICENCES.merchant.terminalLabel}</b> — ${LICENCES.merchant.summary}</p>
       </div>
       <div class="term-rail__panel term-rail__panel--warn" data-intro>
-        <p>${skull()} PIRATED PATTERNS ARE HERESY. EVERY FILE CARRIES A LICENCE SEAL.</p>
+        <p>+++ PIRATED PATTERNS ARE HERESY +++<br>EVERY FILE CARRIES A LICENCE SEAL.</p>
       </div>
     </nav>
 
@@ -257,22 +266,22 @@ export class Store {
 
   <section class="term-codex" aria-label="Archive information">
     <article>
-      <h2>// LICENCE CODEX</h2>
+      <h2>LICENCE CODEX</h2>
       <p>Every requisition issues a licence certificate bound to your account. ${LICENCES.personal.terminalLabel}: ${LICENCES.personal.terms.join(' · ')}. ${LICENCES.merchant.terminalLabel}: ${LICENCES.merchant.terms.join(' · ')}.</p>
     </article>
     <article>
-      <h2>// PRINT DOCTRINE</h2>
+      <h2>PRINT DOCTRINE</h2>
       <p>Files ship as a ZIP: supported and unsupported STL, slicer profiles for resin and FDM, and a part map. Recommended layer height 0.03–0.05 mm on resin.</p>
     </article>
     <article>
-      <h2>// VOX CHANNEL</h2>
+      <h2>VOX CHANNEL</h2>
       <p>Misprint? Missing part? Open a vox ticket from your requisition record and an archivist will answer within one cycle.</p>
     </article>
   </section>
 
   <footer class="term-status">
     <button type="button" class="term-status__cart" data-action="cart">${skull()} REQUISITION <b><span class="term-cart-count">00</span></b> · <span class="term-cart-total">€0.00</span></button>
-    <span class="term-status__item">VOX: CLEAR</span>
+    <span class="term-status__item">+++ VOX: CLEAR +++</span>
     <span class="term-status__item dim">LINK 98.2%</span>
     <span class="term-status__item dim hide-sm">NODE ${BRAND.nodeId}</span>
     <span class="term-status__dat">DAT-F12 <b>00</b></span>
