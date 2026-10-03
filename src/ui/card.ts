@@ -169,8 +169,10 @@ export class ProductCard {
   </div>
   <footer class="card__foot">
     <div class="card__price"><b>${formatPrice(p.price.personal)}</b><small>${LICENCES.personal.terminalLabel} LICENCE</small></div>
-    <button type="button" class="tbtn tbtn--ghost" data-act="inspect">INSPECT</button>
-    <button type="button" class="tbtn" data-act="cart" aria-pressed="false"><span>REQUISITION</span></button>
+    <span class="card__acts">
+      <button type="button" class="tbtn tbtn--ghost" data-act="inspect">INSPECT</button>
+      <button type="button" class="tbtn" data-act="cart" aria-pressed="false"><span>REQUISITION</span></button>
+    </span>
   </footer>
 </article>`;
   }

@@ -14,9 +14,10 @@ then a cogitator printout on scratched red-black glass: uppercase pixel type,
    `SIGNAL LOCKED`, and a dark silhouette of the flagship model turns behind it.
 3. **Clear.** The HUD tears and flickers away. Noise, blur and the teal tint
    drain out, leaving a clean terminal readout.
-4. **Stream.** A boot log types itself in as the heading (ending in
-   `++ LINK ESTABLISHED: BASEDINBATTLE.COM ++`), then the product cards
-   stream in one by one. Each 3D model builds from the bottom up.
+4. **Stream.** A boot log prints over the empty screen, holding on
+   `LOAD HOLO-PLINTHS` until every model has downloaded, and ends in
+   `++ LINK ESTABLISHED: BASEDINBATTLE.COM ++`. It then fades away and the
+   archive streams in from the top, each 3D model building from the bottom up.
 
 No device or monitor frame is ever drawn: the landing page shows an ordinary
 product shot, and the terminal fills the whole viewport. Press **Esc** or **Skip** to jump
