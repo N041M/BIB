@@ -41,6 +41,9 @@ fine scratches.
   dimensions, triangle count and file size read from the actual STL.
 - **Sections.** Archive, Licences, Printing and FAQ are tabs in the
   terminal. Keys **1** to **4** switch between them.
+- **Gallery.** Painted models in full colour below the screen, with a viewer
+  that shows one photo at a time (arrow keys to step through, Esc to close).
+  Put the photos in `public/gallery/` and list them in `src/data/gallery.ts`.
 - **Licences.** Personal or Merchant per model, with a requisition drawer
   (stored in `localStorage`) and a simulated checkout. No payment is taken.
 - **Routing.** `#/` is the page, `#/archive` the screen, and
@@ -110,6 +113,7 @@ src/
   app.ts               routing between the page and the screen
   config.ts            brand, currency, licences
   data/catalog.ts      products
+  data/gallery.ts      gallery photos
   state/cart.ts        cart store (localStorage)
   lib/                 DOM helpers, cancellable timeline, text scramble
   three/
@@ -119,6 +123,7 @@ src/
     renderer.ts        shared scissor renderer for all cards
   ui/
     page.ts            top bar, hero, the section that holds the screen, footer
+    gallery.ts         painted-model grid and photo viewer
     screen.ts          standby, take-over, boot choreography, exit
     boot.ts            power-on, degauss, telemetry readout, power-off
     store.ts, card.ts  the archive as a terminal program

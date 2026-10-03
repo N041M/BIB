@@ -1,8 +1,8 @@
-import { BRAND, LICENCES } from '../config';
-import { CATEGORIES, PRODUCTS } from '../data/catalog';
+import { BRAND, CREATOR } from '../config';
 import { esc, fromHTML, prefersReducedMotion, qs, qsa } from '../lib/dom';
-import { archiveDate, clock, formatPrice } from '../lib/format';
+import { archiveDate, clock } from '../lib/format';
 import { cart } from '../state/cart';
+import { Gallery } from './gallery';
 
 export type TabId = 'archive' | 'licences' | 'printing' | 'faq';
 
@@ -11,7 +11,6 @@ export interface PageCallbacks {
   /** Open the screen on one of its sections. */
   onTab: (tab: TabId, from: DOMRect) => void;
   onCart: (from: DOMRect) => void;
-  onInspect: (slug: string, from: DOMRect) => void;
 }
 
 /** A pointed arch: the brand mark. */
@@ -19,7 +18,7 @@ const MARK = `<svg class="mark" viewBox="0 0 20 24" aria-hidden="true" fill="non
 
 /**
  * Everything outside the screen: the top bar, the hero, the section that
- * holds the screen, and the footer.
+ * holds the screen, the gallery and the footer.
  */
 export class Page {
   readonly el: HTMLElement;
@@ -32,12 +31,17 @@ export class Page {
     this.el = fromHTML(this.template());
     this.glass = qs(this.el, '.crt');
     this.archive = qs(this.el, '#archive');
+    this.archive.after(new Gallery().el);
 
     const rect = (el: HTMLElement) => el.getBoundingClientRect();
     qsa(this.el, '[data-tab]').forEach((btn) => btn.addEventListener('click', () => cb.onTab(btn.dataset.tab as TabId, rect(btn))));
     qsa(this.el, '[data-cart]').forEach((btn) => btn.addEventListener('click', () => cb.onCart(rect(btn))));
-    qsa(this.el, '[data-inspect]').forEach((btn) => btn.addEventListener('click', () => cb.onInspect(btn.dataset.inspect!, rect(btn))));
     qs(this.el, '.hero__scroll').addEventListener('click', () => this.scrollToArchive());
+    qsa(this.el, '[data-scroll]').forEach((btn) =>
+      btn.addEventListener('click', () =>
+        this.el.querySelector(`#${btn.dataset.scroll}`)?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' }),
+      ),
+    );
     qs(this.el, '.bar__brand').addEventListener('click', (e) => {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
@@ -77,18 +81,29 @@ export class Page {
     btn.classList.toggle('has-items', n > 0);
   }
 
+  /** The painter behind the store. Fields left empty in CREATOR are left out. */
+  private about(): string {
+    const { name, tagline, bio, facts, platform, url } = CREATOR;
+    return /* html */ `
+        <article class="about" aria-labelledby="about-h">
+          <header class="about__head"><span id="about-h">About</span><span>Painting streamer</span></header>
+          ${name ? `<p class="about__name">${esc(name)}</p>` : ''}
+          ${tagline ? `<p class="about__tagline">“${esc(tagline)}”</p>` : ''}
+          <p class="about__bio">${esc(bio)}</p>
+          ${facts.length ? `<dl class="about__specs">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>` : ''}
+          ${url ? `<footer class="about__foot"><a class="link" href="${esc(url)}" target="_blank" rel="noopener">Watch ${platform ? `on ${esc(platform)}` : 'the stream'} <span aria-hidden="true">↗</span></a></footer>` : ''}
+        </article>`;
+  }
+
   private template(): string {
     const year = new Date().getFullYear();
-    const featured = PRODUCTS.find((p) => p.featured) ?? PRODUCTS[0];
-    const free = PRODUCTS.find((p) => p.price.personal === 0);
-    const cat = CATEGORIES.find((c) => c.id === featured.category)?.label ?? '';
-    const sentence = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
     return /* html */ `
 <div class="page">
   <header class="bar">
     <a class="bar__brand" href="#top">${MARK}<span>${BRAND.name}</span></a>
-    <nav class="bar__nav" aria-label="Archive sections">
+    <nav class="bar__nav" aria-label="Sections">
       <button type="button" data-tab="archive">Archive</button>
+      <button type="button" data-scroll="gallery">Gallery</button>
       <button type="button" data-tab="licences">Licences</button>
       <button type="button" data-tab="printing">Printing</button>
       <button type="button" data-tab="faq">FAQ</button>
@@ -101,40 +116,20 @@ export class Page {
     <section class="hero" id="top">
       <div class="hero__copy">
         <h1 class="hero__title">${BRAND.name}</h1>
-        <p class="hero__role">Licensed STL patterns <span>/ miniatures, terrain and relics</span></p>
         <p class="hero__lede">Print-ready models for tabletop wargames. Every pattern is test-printed on resin and FDM before release, and you choose a personal or a merchant licence when you buy.</p>
         <div class="hero__actions">
           <button type="button" class="btn btn--primary" data-tab="archive">Enter the archive <span aria-hidden="true">→</span></button>
           <button type="button" class="btn" data-tab="licences">Licences</button>
           <button type="button" class="btn" data-tab="printing">Printing</button>
         </div>
-        ${
-          free
-            ? `<p class="hero__aside"><button type="button" class="link" data-inspect="${free.slug}">Free pattern: ${esc(free.name)} <span aria-hidden="true">→</span></button><span>Test our supports on your printer before you buy.</span></p>`
-            : ''
-        }
-        <article class="plate" aria-label="Pattern of the month">
-          <header class="plate__head"><span>Pattern of the month</span><span>${esc(featured.id)}</span></header>
-          <p class="plate__name">${esc(featured.name)}</p>
-          <p class="plate__desc">${esc(featured.short)}</p>
-          <dl class="plate__specs">
-            <div><dt>Class</dt><dd>${sentence(cat)}</dd></div>
-            <div><dt>Parts</dt><dd>${featured.parts}</dd></div>
-            <div><dt>Scale</dt><dd>${esc(featured.scale.toLowerCase())}</dd></div>
-            <div><dt>Supports</dt><dd>${featured.presupported ? 'Included' : 'None needed'}</dd></div>
-          </dl>
-          <footer class="plate__foot">
-            <span class="plate__price"><b>${formatPrice(featured.price.personal)}</b> ${LICENCES.personal.label.toLowerCase()} · ${formatPrice(featured.price.merchant)} ${LICENCES.merchant.label.toLowerCase()}</span>
-            <button type="button" class="link" data-inspect="${featured.slug}">Inspect <span aria-hidden="true">→</span></button>
-          </footer>
-        </article>
+        ${this.about()}
       </div>
       <div class="hero__stage" aria-hidden="true"></div>
       <button type="button" class="hero__scroll"><span>Scroll</span><i aria-hidden="true"></i></button>
     </section>
 
     <section class="archive" id="archive" aria-label="Pattern archive">
-      <div class="crt" data-state="off"></div>
+      <div class="crt" data-state="standby"></div>
     </section>
   </main>
 

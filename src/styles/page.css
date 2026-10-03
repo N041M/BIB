@@ -7,6 +7,7 @@ html.is-terminal {
 
 .bar,
 .hero,
+.gallery,
 .foot {
   transition:
     opacity 0.7s ease,
@@ -15,6 +16,7 @@ html.is-terminal {
 
 html.is-dimmed .bar,
 html.is-dimmed .hero,
+html.is-dimmed .gallery,
 html.is-dimmed .foot {
   opacity: 0;
   filter: blur(4px);
@@ -168,20 +170,8 @@ html.is-dimmed .foot {
   text-wrap: balance;
 }
 
-.hero__role {
-  margin: 22px 0 0;
-  font: 13px/1.5 var(--font-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.hero__role span {
-  color: var(--muted);
-}
-
 .hero__lede {
-  margin: 18px 0 0;
+  margin: 22px 0 0;
   max-width: 48ch;
   font-size: 16.5px;
   line-height: 1.65;
@@ -239,6 +229,7 @@ html.is-dimmed .foot {
   font: 12.5px/1.5 var(--font-mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  text-decoration: none;
   color: var(--accent);
 }
 
@@ -250,27 +241,17 @@ html.is-dimmed .foot {
   transform: translateX(3px);
 }
 
-.hero__aside {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 6px 16px;
-  margin: 22px 0 0;
-  font-size: 13.5px;
-  color: var(--muted);
-}
-
-/* the data plate under the buttons */
-.plate {
+/* the About panel under the buttons */
+.about {
   position: relative;
   max-width: 540px;
-  margin-top: 40px;
+  margin-top: 44px;
   border: 1px solid var(--line-2);
   background: linear-gradient(180deg, var(--surface), var(--bg-2));
 }
 
-.plate::before,
-.plate::after {
+.about::before,
+.about::after {
   content: '';
   position: absolute;
   width: 9px;
@@ -278,19 +259,19 @@ html.is-dimmed .foot {
   border: 0 solid var(--accent);
 }
 
-.plate::before {
+.about::before {
   top: -1px;
   left: -1px;
   border-width: 1px 0 0 1px;
 }
 
-.plate::after {
+.about::after {
   right: -1px;
   bottom: -1px;
   border-width: 0 1px 1px 0;
 }
 
-.plate__head {
+.about__head {
   display: flex;
   justify-content: space-between;
   padding: 10px 16px;
@@ -301,68 +282,70 @@ html.is-dimmed .foot {
   color: var(--muted);
 }
 
-.plate__head span:last-child {
-  color: var(--ink-2);
+.about__head span:last-child {
+  color: var(--accent);
 }
 
-.plate__name {
+.about__name {
   margin: 16px 16px 0;
-  font-size: 18px;
-  font-weight: 500;
+  font: 600 26px/1 var(--font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--ink);
 }
 
-.plate__desc {
-  margin: 6px 16px 16px;
-  font-size: 14px;
-  line-height: 1.55;
+.about__tagline {
+  margin: 8px 16px 0;
+  font: 12px/1.4 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.about__bio {
+  margin: 14px 16px 16px;
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--ink-2);
 }
 
-.plate__specs {
+.about__name + .about__bio,
+.about__tagline + .about__bio {
+  margin-top: 12px;
+}
+
+.about__specs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   margin: 0;
   border-top: 1px solid var(--line);
 }
 
-.plate__specs div {
+.about__specs div {
   padding: 10px 16px 12px;
   border-left: 1px solid var(--line);
 }
 
-.plate__specs div:first-child {
+.about__specs div:first-child {
   border-left: 0;
 }
 
-.plate__specs dt {
+.about__specs dt {
   font: 10.5px/1.4 var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-.plate__specs dd {
+.about__specs dd {
   margin: 3px 0 0;
   font-size: 14px;
   color: var(--ink);
 }
 
-.plate__foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px 16px;
+.about__foot {
   padding: 12px 16px;
   border-top: 1px solid var(--line);
-  font-size: 13.5px;
-  color: var(--muted);
-}
-
-.plate__price b {
-  font-weight: 500;
-  color: var(--ink);
 }
 
 .hero__scroll {
@@ -415,18 +398,6 @@ html.is-dimmed .foot {
   }
   .hero__stage {
     display: none;
-  }
-}
-
-@media (max-width: 560px) {
-  .plate__specs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .plate__specs div:nth-child(3) {
-    border-left: 0;
-  }
-  .plate__specs div:nth-child(n + 3) {
-    border-top: 1px solid var(--line);
   }
 }
 

@@ -35,7 +35,6 @@ export class App {
     this.page = new Page({
       onTab: (tab, from) => this.enter(from, (screen) => screen.showTab(tab)),
       onCart: (from) => this.enter(from, (screen) => screen.openCart()),
-      onInspect: (slug, from) => this.enter(from, () => this.inspect(slug)),
     });
     root.append(this.page.el);
     this.screenReady = import('./ui/screen').then(({ Screen }) => {
