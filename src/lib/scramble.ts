@@ -44,11 +44,41 @@ export function scramble(el: HTMLElement, text: string, opts: ScrambleOptions = 
   });
 }
 
+/**
+ * Types `text` into `el` one character at a time behind a block cursor,
+ * like a cogitator printing its boot log.
+ */
+export function typewrite(el: HTMLElement, text: string, opts: { cps?: number; delay?: number } = {}): Promise<void> {
+  const { cps = 70, delay = 0 } = opts;
+  const prev = running.get(el);
+  if (prev) cancelAnimationFrame(prev);
+  el.textContent = '';
+  el.classList.add('is-typing');
+  return new Promise((resolve) => {
+    let start = 0;
+    const step = (now: number) => {
+      if (!start) start = now + delay;
+      const n = Math.max(0, Math.floor(((now - start) / 1000) * cps));
+      if (n >= text.length) {
+        el.textContent = text;
+        el.classList.remove('is-typing');
+        running.delete(el);
+        resolve();
+        return;
+      }
+      el.textContent = text.slice(0, n);
+      running.set(el, requestAnimationFrame(step));
+    };
+    running.set(el, requestAnimationFrame(step));
+  });
+}
+
 /** Instantly finish any scramble running on `el`. */
 export function settle(el: HTMLElement, text: string): void {
   const prev = running.get(el);
   if (prev) cancelAnimationFrame(prev);
   running.delete(el);
+  el.classList.remove('is-typing');
   el.textContent = text;
 }
 

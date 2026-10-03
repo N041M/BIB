@@ -26,11 +26,20 @@
   transition: opacity 1s ease;
 }
 
-/* dark glass with a low crimson haze */
+/* old glass: warm red-black, a little ember light, years of fine scratches */
 .screen__bg--store {
   background:
-    radial-gradient(60% 45% at 50% 0%, rgb(150 16 22 / 0.2), transparent 70%),
-    radial-gradient(120% 90% at 50% 40%, #121316 0%, #0b0b0d 55%, #050506 100%);
+    radial-gradient(55% 45% at 62% 46%, rgb(120 30 18 / 0.16), transparent 70%),
+    radial-gradient(120% 100% at 50% 45%, #150c09 0%, #0d0806 55%, #050302 100%);
+}
+
+.screen__bg--store::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='none' fill='none' stroke='%23c9b4ae' stroke-linecap='round'><g stroke-opacity='.09' stroke-width='1'><path d='M700 340 Q760 470 830 590'/><path d='M412 440 Q380 620 320 760'/><path d='M560 460 Q600 560 650 700'/><path d='M1100 430 Q1120 560 1135 750'/><path d='M960 360 Q980 470 1010 560'/><path d='M1230 220 Q1320 330 1400 380'/><path d='M1440 240 Q1500 270 1560 300'/><path d='M890 700 Q1050 760 1220 800'/><path d='M300 380 Q350 430 390 520'/><path d='M1250 0 Q1265 30 1280 60'/><path d='M60 380 Q110 430 150 470'/><path d='M640 650 Q770 645 900 650'/></g><g stroke-opacity='.05' stroke-width='.8'><path d='M180 120 Q480 90 760 140'/><path d='M920 120 Q1080 100 1160 110'/><path d='M200 780 Q260 740 330 720'/><path d='M1000 450 Q1020 480 1040 485'/><path d='M1350 600 Q1420 650 1500 690'/></g></svg>") center / 100% 100% no-repeat;
 }
 
 

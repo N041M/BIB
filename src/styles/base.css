@@ -23,15 +23,15 @@
   --lp-radius: 4px;
 
   /* cogitator terminal */
-  --t-void: #060607;
-  --t-bg: #0b0b0d;
-  --t-panel: #0f1013;
-  --t-panel-2: #15161a;
-  --t-fg-rgb: 205 209 215;
+  --t-void: #060403;
+  --t-bg: #0d0806;
+  --t-panel: #110a08;
+  --t-panel-2: #170e0b;
+  --t-fg-rgb: 214 203 199;
   --t-red-rgb: 226 36 42;
   --t-fg: rgb(var(--t-fg-rgb));
   --t-fg-hi: var(--silver-hi);
-  --t-fg-dim: var(--silver-dim);
+  --t-fg-dim: #8c7f7b;
   --t-red: rgb(var(--t-red-rgb));
   --t-red-hi: var(--red-glow);
   --t-red-deep: #7d0e13;
