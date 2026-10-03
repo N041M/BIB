@@ -51,6 +51,14 @@ npm run preview
 The build uses a relative `base`, so `dist/` can be served from any sub-path
 (GitHub Pages, S3, Netlify, and so on).
 
+## GitHub Pages
+
+`.github/workflows/deploy-pages.yml` builds the site and publishes `dist/` to
+GitHub Pages on every push to the deploy branch, or on demand from the
+Actions tab. Setup is one-time: in **Settings → Pages → Build and deployment**,
+set **Source** to **GitHub Actions**. The site is then served at
+`https://<owner>.github.io/<repo>/`.
+
 ## The models
 
 `public/models/*.stl` are **procedurally generated placeholders**: original
