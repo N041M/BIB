@@ -1,5 +1,7 @@
 import { BRAND } from '../config';
-import { fromHTML, qs, qsa } from '../lib/dom';
+import { PRODUCTS } from '../data/catalog';
+import { esc, fromHTML, qs, qsa } from '../lib/dom';
+import { formatPrice } from '../lib/format';
 
 export interface LandingCallbacks {
   /** Wake the screen. `origin` is the rectangle the takeover expands from. */
@@ -16,13 +18,14 @@ const ICONS = {
 /** The deliberately ordinary storefront landing page. */
 export class Landing {
   readonly el: HTMLElement;
-  private screen: HTMLButtonElement;
+  /** The hero showcase: clicking it is what wakes the cogitator. */
+  private showcase: HTMLButtonElement;
 
   constructor(private cb: LandingCallbacks) {
     this.el = fromHTML(this.template());
-    this.screen = qs<HTMLButtonElement>(this.el, '.display');
+    this.showcase = qs<HTMLButtonElement>(this.el, '.showcase');
 
-    this.screen.addEventListener('click', () => this.enter(this.screenRect(), true));
+    this.showcase.addEventListener('click', () => this.enter(this.screenRect(), true));
     qsa(this.el, '[data-enter]').forEach((btn) =>
       btn.addEventListener('click', () => this.enter(this.originFor(btn), false)),
     );
@@ -37,7 +40,7 @@ export class Landing {
   show(): void {
     this.el.hidden = false;
     this.el.classList.remove('lp--leaving', 'lp--gone');
-    this.screen.classList.remove('display--waking');
+    this.showcase.classList.remove('showcase--waking');
     document.documentElement.classList.remove('is-terminal', 'is-dimmed');
   }
 
@@ -60,16 +63,17 @@ export class Landing {
     window.setTimeout(() => this.el.classList.remove('lp--returning'), 900);
   }
 
+  /** The rectangle the takeover expands from: the showcase panel. */
   screenRect(): DOMRect {
-    return qs(this.el, '.display__screen').getBoundingClientRect();
+    return qs(this.el, '.showcase__panel').getBoundingClientRect();
   }
 
-  private enter(origin: DOMRect, fromScreen: boolean): void {
-    if (fromScreen) this.screen.classList.add('display--waking');
+  private enter(origin: DOMRect, fromShowcase: boolean): void {
+    if (fromShowcase) this.showcase.classList.add('showcase--waking');
     this.cb.onEnter(origin);
   }
 
-  /** Expand from the monitor when it is on screen, otherwise from the clicked control. */
+  /** Expand from the showcase when it is on screen, otherwise from the clicked control. */
   private originFor(btn: HTMLElement): DOMRect {
     const r = this.screenRect();
     const visible = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
@@ -78,6 +82,8 @@ export class Landing {
 
   private template(): string {
     const year = new Date().getFullYear();
+    const featured = PRODUCTS.find((p) => p.featured) ?? PRODUCTS[0];
+    const hero = (w: number) => `${import.meta.env.BASE_URL}hero/castellan-${w}.webp`;
     return /* html */ `
 <div class="lp">
   <header class="lp-nav">
@@ -110,19 +116,20 @@ export class Landing {
         </ul>
       </div>
 
-      <div class="lp-hero__display">
-        <button type="button" class="display" aria-label="Wake the screen to open the model archive">
-          <span class="display__screen">
-            <span class="display__sleep">
-              <span class="display__led" aria-hidden="true"></span>
-              <span class="display__hint">Click to wake</span>
+      <div class="lp-hero__visual">
+        <button type="button" class="showcase" aria-label="Enter the archive and browse every model, starting with the ${esc(featured.name)}">
+          <span class="showcase__panel">
+            <span class="showcase__light" aria-hidden="true"></span>
+            <img class="showcase__img" src="${hero(1600)}" srcset="${hero(800)} 800w, ${hero(1600)} 1600w" sizes="(max-width: 960px) 92vw, 680px" width="1600" height="1100" alt="Render of the ${esc(featured.name)} model" decoding="async" fetchpriority="high">
+            <span class="showcase__tag">Pattern of the month</span>
+            <span class="showcase__meta">
+              <span class="showcase__name">${esc(featured.name)}</span>
+              <span class="showcase__info">${featured.parts} parts · ${esc(featured.scale.toLowerCase())} · from ${formatPrice(featured.price.personal)}</span>
             </span>
-            <span class="display__tease" aria-hidden="true"></span>
-            <span class="display__glare" aria-hidden="true"></span>
+            <span class="showcase__cta">Enter the archive <span aria-hidden="true">→</span></span>
+            <span class="showcase__tease" aria-hidden="true"></span>
           </span>
-          <span class="display__stand" aria-hidden="true"><span class="display__neck"></span><span class="display__foot"></span></span>
         </button>
-        <p class="lp-display-caption">The full catalogue lives on this screen.</p>
       </div>
     </section>
 

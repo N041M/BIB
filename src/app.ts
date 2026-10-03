@@ -61,7 +61,7 @@ export class App {
     }
   }
 
-  /** Click on the landing monitor (or any "browse" control). */
+  /** Click on the landing showcase (or any "browse" control). */
   private wake(origin: DOMRect): void {
     if (this.mode !== 'landing') return;
     this.mode = 'booting';

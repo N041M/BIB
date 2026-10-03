@@ -1,14 +1,14 @@
 # Based in Battle · Pattern Archive
 
 A storefront for licensed STL miniatures ([basedinbattle.com](https://basedinbattle.com))
-that starts as an ordinary, modern landing page in gunmetal, silver and crimson. Click the monitor in the hero and the page gives way to a
+that starts as an ordinary, modern landing page in gunmetal, silver and crimson. Click the product showcase in the hero and the page gives way to a
 cogitator screen inspired by grimdark gothic sci-fi: a crimson combat-visor HUD,
 then an engraved, riveted terminal with a crimson objectives banner, a wax
 purity seal and `+++` vox markers:
 
-1. **Wake.** The dark monitor glass expands until it *is* the page, while the
-   landing page blurs and fades out underneath it. A power-on line blooms into
-   a flash.
+1. **Wake.** The showcase panel powers on in place (a hot line, static), then
+   grows until it *is* the page while the landing page dims and blurs away
+   underneath it.
 2. **Visor HUD.** Noisy, teal and half-legible. Brackets draw in, panels and
    readouts flicker on at random, the objective plate goes from `STANDBY` to
    `SIGNAL LOCKED`, and a dark silhouette of the flagship model turns behind it.
@@ -18,8 +18,8 @@ purity seal and `+++` vox markers:
    band blooms, and product cards stream in one by one. Each 3D model builds
    from the bottom up.
 
-The monitor's frame is never shown. The landing page shows only the glass,
-and the terminal fills the whole viewport. Press **Esc** or **Skip** to jump
+No device or monitor frame is ever drawn: the landing page shows an ordinary
+product shot, and the terminal fills the whole viewport. Press **Esc** or **Skip** to jump
 straight to the store, and click the sigil in the top-left to power the
 screen back down.
 
@@ -111,7 +111,7 @@ src/
     stage.ts           one model on a holo-plinth (camera fit, build-up, modes)
     renderer.ts        shared scissor renderer for all cards
   ui/
-    landing.ts         the ordinary landing page and its monitor
+    landing.ts         the ordinary landing page and its hero showcase
     screen.ts          the takeover + boot choreography
     hud.ts             visor HUD (boot phase)
     store.ts, card.ts  terminal storefront

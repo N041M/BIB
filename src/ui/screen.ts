@@ -18,7 +18,7 @@ export interface ScreenCallbacks {
 
 /**
  * The cogitator screen. It is a fixed full-viewport layer that starts clipped
- * to the landing page monitor and grows until it *is* the page. No bezel, ever.
+ * to the landing page showcase panel and grows until it *is* the page.
  */
 export class Screen {
   readonly el: HTMLElement;
@@ -82,7 +82,7 @@ export class Screen {
   }
 
   /**
-   * The full wake sequence: expand from the monitor, power-on flash, the
+   * The full wake sequence: power on inside the showcase, expand, the
    * noisy visor HUD, then the clear terminal and the patterns streaming in.
    */
   async boot(origin: DOMRect, onExpanded: () => void): Promise<void> {
@@ -109,7 +109,7 @@ export class Screen {
     this.prepareHero();
     hud.mount(this.el);
 
-    // 1 — the monitor's glass powers on in place: a hot line blooms into a flash
+    // 1 — the showcase panel powers on in place: a hot line blooms into a flash
     this.setPhase('ignite');
     await seq.wait(240);
 
@@ -223,11 +223,11 @@ export class Screen {
     this.el.dataset.phase = phase;
   }
 
-  /** Returns a setter that clips the screen between the monitor glass (0) and the full viewport (1). */
+  /** Returns a setter that clips the screen between the showcase panel (0) and the full viewport (1). */
   private clipper(origin: DOMRect): (k: number) => void {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const from = { t: origin.top, r: vw - origin.right, b: vh - origin.bottom, l: origin.left, rad: 12 };
+    const from = { t: origin.top, r: vw - origin.right, b: vh - origin.bottom, l: origin.left, rad: 4 };
     return (k: number) => {
       if (k >= 1) {
         this.el.style.clipPath = 'none';
