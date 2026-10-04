@@ -4,8 +4,11 @@ import { BACKDROP_DIR, currentPoster, STILL_TIME, TALL, TALL_QUERY, WIDE, type P
 
 /** Shortest gaps between drawn frames, in ms: about 60 fps, then 30 and 20 as the GPU falls behind. */
 const GAPS = [12, 30, 46];
-/** Frames judged before deciding whether the GPU keeps up, and how many of them may be late. */
-const JUDGE = { frames: 40, late: 8 };
+/**
+ * Frames judged at a time. When more than `late` of them arrive late the
+ * overlay draws less often. At 20 fps it stops when more than `stop` are late.
+ */
+const JUDGE = { frames: 40, late: 8, stop: 20 };
 
 /** The <picture> for the hero background. The browser picks the size, and the CSS crops it to fill. */
 export function backdropMarkup(): string {
@@ -28,8 +31,8 @@ export function backdropMarkup(): string {
  * The overlay draws only while the hero is on screen, the tab is visible and
  * the archive screen is not filling the tab. It is never started with reduced
  * motion, when the browser asks to save data, or without WebGL2. When frames
- * keep arriving late it drops to about 30 fps, then 20, then stops and leaves
- * the image.
+ * keep arriving late it drops to about 30 fps and then 20. It stops and
+ * leaves the image only when most frames are still late at 20 fps.
  */
 export class Backdrop {
   private img: HTMLImageElement;
@@ -43,7 +46,7 @@ export class Backdrop {
   /** Which of GAPS the overlay draws at. */
   private pace = 0;
   private lastDraw = 0;
-  /** Set when a frame came due while the GPU was still busy. */
+  /** Set when a frame came due while the GPU had no room for it. */
   private waited = false;
   private judged = { frames: 0, late: 0 };
   private stopped = false;
@@ -119,7 +122,7 @@ export class Backdrop {
       live.prepare();
       if (!live.ready) return this.wake();
       if (now - this.lastDraw >= GAPS[this.pace]) {
-        if (!live.idle()) {
+        if (!live.hasRoom()) {
           this.waited = true;
         } else {
           if (this.lastDraw && now - this.lastDraw < 250) this.judge(this.waited);
@@ -136,16 +139,18 @@ export class Backdrop {
     }
   };
 
-  /** Count late frames, and draw less once too many are late. */
+  /** Count late frames, draw less often once too many are late, and stop when most are late at the slowest pace. */
   private judge(late: boolean): void {
     this.judged.frames++;
     if (late) this.judged.late++;
     if (this.judged.frames < JUDGE.frames) return;
-    const tooSlow = this.judged.late > JUDGE.late;
+    const count = this.judged.late;
     this.judged = { frames: 0, late: 0 };
-    if (!tooSlow) return;
-    if (this.pace < GAPS.length - 1) this.pace++;
-    else this.stop();
+    if (this.pace < GAPS.length - 1) {
+      if (count > JUDGE.late) this.pace++;
+    } else if (count > JUDGE.stop) {
+      this.stop();
+    }
   }
 
   /** Give up on the overlay for good and leave the image. */

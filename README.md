@@ -76,7 +76,8 @@ The overlay draws at about 60 frames per second, and only while the hero is
 on screen, the tab is visible and the archive screen is closed. It is not
 started with reduced motion, when the browser asks to save data, or without
 WebGL2. When frames keep arriving late, it drops to 30 and then 20 frames per
-second, and then stops, which leaves the image.
+second. It stops and leaves the image only when most frames are still late at
+20 frames per second.
 
 The scene is defined in code:
 

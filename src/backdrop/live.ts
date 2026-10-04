@@ -16,6 +16,12 @@ import volumeFrag from './shaders/volume.frag?raw';
 
 type ProgramName = 'volume' | 'live' | 'sprite' | 'finish';
 const ORDER: ProgramName[] = ['volume', 'live', 'sprite', 'finish'];
+/**
+ * Frames the GPU may still be drawing when the next one is sent. A browser
+ * reports a frame as finished two or three display frames after it was sent,
+ * even on a fast GPU, so a lower limit would cut the frame rate.
+ */
+const IN_FLIGHT = 3;
 
 export interface Colours {
   accent: [number, number, number];
@@ -28,8 +34,9 @@ export interface Colours {
  * image the page shows and never renders the hall itself, so it is cheap to
  * compile and to run.
  *
- * Each frame ends with a fence, and the caller checks `idle()` before asking
- * for the next one, so frames never pile up on a slow GPU.
+ * Each frame ends with a fence, and the caller checks `hasRoom()` before
+ * asking for the next one, so a slow GPU never has more than a few frames
+ * queued.
  */
 export class LiveRenderer {
   readonly gl: WebGL2RenderingContext;
@@ -46,7 +53,8 @@ export class LiveRenderer {
   private images: WebGLTexture[];
   private target: Target;
   private frame = 0;
-  private fence: WebGLSync | null = null;
+  /** Fences of the frames the GPU may still be drawing, oldest first. */
+  private inFlight: WebGLSync[] = [];
 
   private constructor(
     private canvas: HTMLCanvasElement,
@@ -121,14 +129,13 @@ export class LiveRenderer {
     return this.linked === ORDER.length;
   }
 
-  /** True when the GPU has finished the last frame. */
-  idle(): boolean {
+  /** True when fewer than IN_FLIGHT frames are still on the GPU. */
+  hasRoom(): boolean {
     const gl = this.gl;
-    if (!this.fence) return true;
-    if (gl.getSyncParameter(this.fence, gl.SYNC_STATUS) !== gl.SIGNALED) return false;
-    gl.deleteSync(this.fence);
-    this.fence = null;
-    return true;
+    while (this.inFlight.length && gl.getSyncParameter(this.inFlight[0], gl.SYNC_STATUS) === gl.SIGNALED) {
+      gl.deleteSync(this.inFlight.shift()!);
+    }
+    return this.inFlight.length < IN_FLIGHT;
   }
 
   /** Draw the scene at `time` seconds. */
@@ -181,8 +188,8 @@ export class LiveRenderer {
     gl.uniform3fv(p.u('uBg'), this.colours.bg);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    if (this.fence) gl.deleteSync(this.fence);
-    this.fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    const fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    if (fence) this.inFlight.push(fence);
     gl.flush();
   }
 
@@ -191,8 +198,8 @@ export class LiveRenderer {
     for (const p of Object.values(this.programs)) p?.dispose();
     for (const t of [this.noise, this.light, ...this.images]) gl.deleteTexture(t);
     deleteTarget(gl, this.target);
-    if (this.fence) gl.deleteSync(this.fence);
-    this.fence = null;
+    for (const fence of this.inFlight) gl.deleteSync(fence);
+    this.inFlight = [];
   }
 
   private program(name: ProgramName): Program {
