@@ -202,7 +202,6 @@ html.is-dimmed .foot {
   grid-template-columns: minmax(0, 580px) minmax(0, 1fr);
   gap: 48px;
   align-items: center;
-  scroll-snap-align: start;
 }
 
 /* kept empty so the servitor in the scene behind the hero shows through */
@@ -458,7 +457,6 @@ html.is-dimmed .foot {
   height: 100svh;
   min-height: 540px;
   padding: calc(var(--bar-h) + 14px) var(--gutter) 16px;
-  scroll-snap-align: start;
 }
 
 /* ───────────────── Footer ───────────────── */
