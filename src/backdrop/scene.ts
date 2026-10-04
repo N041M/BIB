@@ -63,6 +63,21 @@ const CENSER = {
   period: 2.9,
 };
 
+/**
+ * Where the censer body is at a given time, for the glow drawn round it.
+ * The shaders work it out themselves in motion.glsl with the same formula.
+ */
+export function censerPosition(time: number): Vec3 {
+  const w = (2 * Math.PI) / CENSER.period;
+  const a = CENSER.amplitude * Math.sin(w * time);
+  const b = 0.22 * CENSER.amplitude * Math.sin(w * time + 1.1);
+  const [fx, fz] = SERVITOR.fwd;
+  const [rx, rz] = SERVITOR.right;
+  const d = normalize([fx * Math.sin(a) + rx * Math.sin(b), -Math.cos(a) * Math.cos(b), fz * Math.sin(a) + rz * Math.sin(b)]);
+  const p = CENSER.pivot;
+  return [p[0] + d[0] * CENSER.length, p[1] + d[1] * CENSER.length, p[2] + d[2] * CENSER.length];
+}
+
 /** The servitor's glowing optic. */
 export const OPTIC = servitorToWorld([-0.036, 1.535, 0.31]);
 

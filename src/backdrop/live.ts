@@ -1,6 +1,6 @@
 import { bindTextures, createTarget, deleteTarget, Program, type Target } from './gl';
 import { BACKDROP_DIR, posterHeight, type Poster } from './posters';
-import { ember, flicker, sceneGLSL } from './scene';
+import { censerPosition, ember, flicker, sceneGLSL } from './scene';
 import { bakeVolume, createNoise, createSprites, createTexture3D, HEADER, setView, SPRITE_ATTRIBUTES, VOLUME } from './shared';
 import censerGlsl from './shaders/censer.glsl?raw';
 import commonGlsl from './shaders/common.glsl?raw';
@@ -164,6 +164,8 @@ export class LiveRenderer {
     gl.uniform1f(p.u('uTime'), time);
     gl.uniform4fv(p.u('uFlicker'), flick);
     gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+    gl.uniform3fv(p.u('uCenser'), censerPosition(time));
+    gl.uniform1f(p.u('uEmber'), ember(time));
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE);
     gl.bindVertexArray(this.spriteVao);
@@ -198,11 +200,14 @@ export class LiveRenderer {
   }
 }
 
-async function loadImage(url: string): Promise<HTMLImageElement> {
-  const img = new Image();
-  img.src = url;
-  await img.decode();
-  return img;
+/** Waits for the load event rather than decode(), which Chrome holds back while the tab is hidden. */
+function loadImage(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`could not load ${url}`));
+    img.src = url;
+  });
 }
 
 /** Upload an image unchanged: no colour conversion, bottom row first to match gl_FragCoord. */

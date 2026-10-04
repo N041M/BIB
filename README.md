@@ -70,12 +70,13 @@ top of the same image. It makes the candle light flicker, and draws the
 flames, the swinging censer, its smoke and the dust in the light. It starts
 from a copy of the image without those parts, plus two small maps that hold
 the depth and how much each group of candles lights each pixel. It never
-renders the hall itself. Its code is about 16 KB and its images about 110 KB.
+renders the hall itself. Its code is about 17 KB and its images about 110 KB.
 
-The overlay draws only while the hero is on screen, the tab is visible and
-the archive screen is closed. It is not started with reduced motion, when the
-browser asks to save data, or without WebGL2. When frames keep arriving late,
-it drops to about 20 frames per second and then stops, which leaves the image.
+The overlay draws at about 60 frames per second, and only while the hero is
+on screen, the tab is visible and the archive screen is closed. It is not
+started with reduced motion, when the browser asks to save data, or without
+WebGL2. When frames keep arriving late, it drops to 30 and then 20 frames per
+second, and then stops, which leaves the image.
 
 The scene is defined in code:
 

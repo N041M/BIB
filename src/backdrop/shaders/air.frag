@@ -8,15 +8,7 @@ uniform sampler2D uDay;
 uniform int uFrame;
 uniform bool uDynamic; // false leaves out the smoke and the censer's glow
 
-const float SHAFT_GAIN = 9.0;
 const int FOG_STEPS = 24;
-
-float haze(vec3 p) {
-  vec3 w = vec3(0.05, 0.012, 0.07) * uTime;
-  float n = tnoise(p * 0.45 + w) * 0.6 + tnoise(p * 1.2 - w * 1.7) * 0.4;
-  float h = 0.7 + 0.6 * smoothstep(1.0, 11.0, p.y);
-  return HAZE * h * (0.15 + 3.0 * n * n * n);
-}
 
 vec4 air(vec3 ro, vec3 rd, float tEnd, vec3 censer) {
   float tMax = min(tEnd, 60.0);
@@ -56,18 +48,6 @@ vec4 air(vec3 ro, vec3 rd, float tEnd, vec3 censer) {
   return vec4(front + tFront * (plume + tPlume * back), tFront * tPlume * tBack);
 }
 
-vec3 glows(vec3 ro, vec3 rd, float tEnd, vec3 censer) {
-  vec3 sum = vec3(0.0);
-  for (int c = uZero; c < N_CLUSTERS; c++) {
-    vec4 cl = CLUSTER_L[c];
-    vec4 ci = CLUSTER_I[c];
-    vec3 col = ci.z < 0.5 ? VOTIVE_COL : CANDLE_COL;
-    sum += col * ci.x * uFlicker[int(ci.z)] * pointGlow(ro, rd, cl.xyz, tEnd, cl.w + 0.05);
-  }
-  if (uDynamic) sum += EMBER_COL * uEmber * 0.5 * pointGlow(ro, rd, censer, tEnd, 0.06);
-  sum += SKY_COL * 9.0 * pointGlow(ro, rd, vec3(0.0, 5.5, END_Z + 1.0), tEnd, 2.0);
-  return sum * HAZE / (4.0 * PI);
-}
 
 void main() {
   // each texel stands for a 2×2 block of the bake and uses its lower-left depth
@@ -77,6 +57,6 @@ void main() {
   vec3 rd = cameraRay(vec2(full) + 0.5);
   vec3 censer = censerAt(uTime);
   vec4 a = air(ro, rd, tEnd, censer);
-  a.rgb += glows(ro, rd, tEnd, censer);
+  a.rgb += glows(ro, rd, tEnd, censer, uDynamic);
   oAir = a;
 }

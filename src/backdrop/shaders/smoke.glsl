@@ -1,4 +1,4 @@
-// The censer's smoke, and the closed-form glow of a point light in the haze.
+// The censer's smoke, and the glow of the candles and embers in the haze.
 // Needs motion.glsl.
 
 const int SMOKE_STEPS = 28;
@@ -62,4 +62,19 @@ float pointGlow(vec3 ro, vec3 rd, vec3 c, float tEnd, float soft) {
   float s0 = dot(oc, rd);
   float h = sqrt(max(dot(oc, oc) - s0 * s0, 0.0) + soft * soft);
   return (atan((tEnd - s0) / h) + atan(s0 / h)) / h * exp(-(HAZE + ABSORB) * max(s0, 0.0));
+}
+
+// The glow of every candle cluster, the censer's embers and the end window in
+// the haze along [0, tEnd]. dynamic false leaves out the embers.
+vec3 glows(vec3 ro, vec3 rd, float tEnd, vec3 censer, bool dynamic) {
+  vec3 sum = vec3(0.0);
+  for (int c = uZero; c < N_CLUSTERS; c++) {
+    vec4 cl = CLUSTER_L[c];
+    vec4 ci = CLUSTER_I[c];
+    vec3 col = ci.z < 0.5 ? VOTIVE_COL : CANDLE_COL;
+    sum += col * ci.x * uFlicker[int(ci.z)] * pointGlow(ro, rd, cl.xyz, tEnd, cl.w + 0.05);
+  }
+  if (dynamic) sum += EMBER_COL * uEmber * 0.5 * pointGlow(ro, rd, censer, tEnd, 0.06);
+  sum += SKY_COL * 9.0 * pointGlow(ro, rd, vec3(0.0, 5.5, END_Z + 1.0), tEnd, 2.0);
+  return sum * HAZE / (4.0 * PI);
 }

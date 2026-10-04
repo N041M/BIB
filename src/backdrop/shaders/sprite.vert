@@ -4,9 +4,10 @@
 in vec2 aCorner;
 in vec4 aPos;  // centre, then size in metres
 in vec4 aInfo; // flicker group, seed, kind, brightness
-// kinds: 0 flame, 1 flame mirrored in the floor, 2 glow, 3 dust mote
+// kinds: 0 flame, 1 flame mirrored in the floor, 2 glow, 3 dust mote, 4 the glow round the censer
 
 uniform float uTime;
+uniform vec3 uCenser;
 
 out vec2 vUv;
 out float vDist;
@@ -24,6 +25,7 @@ void main() {
   float kind = aInfo.z;
   vColor = vec3(0.0);
   if (kind == 1.0) wp.y = -wp.y;
+  if (kind == 4.0) wp = uCenser + vec3(0.0, 0.03, 0.0);
   if (kind == 3.0) {
     // each mote wanders in a slow loop and sinks, wrapping back to the top
     float s = aInfo.y * 97.0;
@@ -40,7 +42,7 @@ void main() {
   if (c.z < 0.3) { hide(); return; }
   vec2 ndc = (c.xy / c.z - uLens.zw) / uLens.xy;
   float hPx = max(aPos.w * uRes.y / (2.0 * uLens.y * c.z), 1.0);
-  vec2 halfPx = kind == 2.0 || kind == 3.0 ? vec2(hPx * 3.0) : vec2(hPx * 1.4, hPx * 2.2);
+  vec2 halfPx = kind >= 2.0 ? vec2(hPx * 3.0) : vec2(hPx * 1.4, hPx * 2.2);
   if (kind == 1.0) halfPx.y *= 2.2;
   halfPx += kind == 3.0 ? 1.0 : 3.0;
   gl_Position = vec4(ndc + aCorner * halfPx * 2.0 / uRes, 0.0, 1.0);

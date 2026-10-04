@@ -6,6 +6,9 @@ layout(location = 0) out vec4 oColor;
 uniform float uTime;
 uniform vec4 uFlicker;
 uniform vec3 uAccent;
+uniform float uEmber;
+
+const vec3 EMBER = vec3(1.0, 0.32, 0.08);
 
 in vec2 vUv;
 in float vDist;
@@ -54,6 +57,13 @@ void main() {
     gain *= gloss * 0.4;
   } else if (sceneDepth(px) < vDist - 0.12) {
     discard;
+  }
+
+  if (kind == 4.0) {
+    // the embers' light spilling round the censer, as bloom would
+    float r = length(q);
+    oColor = vec4(EMBER * uEmber * (exp(-r * r * 6.0) * 0.5 + exp(-r * 1.5) * 0.16) * gain, 0.0);
+    return;
   }
 
   if (kind == 3.0) {

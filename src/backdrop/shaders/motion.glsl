@@ -17,6 +17,8 @@ const float HAZE = 0.016;
 const float ABSORB = 0.02;
 // the faint light every bit of haze gets from its surroundings
 const vec3 FOG_AMB = vec3(0.0004, 0.00055, 0.0007);
+// how much brighter the window light looks in the haze than the haze density alone gives
+const float SHAFT_GAIN = 9.0;
 
 // Smooth value noise from the 32³ texture of random values.
 float tnoise(vec3 p) {
@@ -25,6 +27,14 @@ float tnoise(vec3 p) {
   vec3 f = fract(y);
   f = f * f * (3.0 - 2.0 * f);
   return textureLod(uNoise, (i + f + 0.5) / 32.0, 0.0).r;
+}
+
+// Density of the haze, drifting slowly and thicker toward the vault.
+float haze(vec3 p) {
+  vec3 w = vec3(0.05, 0.012, 0.07) * uTime;
+  float n = tnoise(p * 0.45 + w) * 0.6 + tnoise(p * 1.2 - w * 1.7) * 0.4;
+  float h = 0.7 + 0.6 * smoothstep(1.0, 11.0, p.y);
+  return HAZE * h * (0.15 + 3.0 * n * n * n);
 }
 
 // Daylight reaching p through the windows, from the light volume.

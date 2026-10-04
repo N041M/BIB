@@ -69,7 +69,7 @@ export function bakeVolume(gl: WebGL2RenderingContext, p: Program, light: WebGLT
   gl.deleteFramebuffer(fb);
 }
 
-/** One instance per flame, one per reflection of a flame, the servitor's optic and the dust. */
+/** One instance per flame, one per reflection of a flame, the servitor's optic, the glow round the censer and the dust. */
 export function createSprites(gl: WebGL2RenderingContext): [WebGLVertexArrayObject, number] {
   const data: number[] = [];
   const lit = CANDLES.filter((c) => c.lit);
@@ -81,6 +81,8 @@ export function createSprites(gl: WebGL2RenderingContext): [WebGLVertexArrayObje
     });
   }
   data.push(OPTIC[0], OPTIC[1], OPTIC[2], 0.012, 0, 0.3, 2, 1);
+  // placed at the censer each frame by the uCenser uniform
+  data.push(0, 0, 0, 0.1, 0, 0.5, 4, 1);
   let s = 0x9e3779b9;
   const rand = () => {
     s ^= s << 13;

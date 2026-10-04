@@ -1,5 +1,5 @@
 import { bindTextures, createTarget, deleteTarget, Program, type Target } from '../gl';
-import { ember, sceneGLSL } from '../scene';
+import { censerPosition, ember, sceneGLSL } from '../scene';
 import { bakeVolume, createNoise, createSprites, createTexture3D, HEADER, setView, SPRITE_ATTRIBUTES, VOLUME } from '../shared';
 import airFrag from '../shaders/air.frag?raw';
 import bakeFrag from '../shaders/bake.frag?raw';
@@ -183,6 +183,8 @@ export class StudioRenderer {
       gl.uniform1f(p.u('uTime'), time);
       gl.uniform4fv(p.u('uFlicker'), STEADY);
       gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+      gl.uniform3fv(p.u('uCenser'), censerPosition(time));
+      gl.uniform1f(p.u('uEmber'), ember(time));
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.ONE, gl.ONE);
       gl.bindVertexArray(this.spriteVao);

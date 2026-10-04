@@ -9,12 +9,12 @@ float sdCenser(vec3 q, out float chain) {
   float fin = min(sdCapsule(q, vec3(0.0, 0.1, 0.0), vec3(0.0, 0.135, 0.0), 0.01), length(q - vec3(0.0, 0.142, 0.0)) - 0.016);
   float body = min(min(bowl, lid), min(rim, min(foot, fin)));
   vec3 ring = vec3(0.0, 0.29, 0.0);
-  float c = sdCapsule(q, ring, vec3(0.0, CENSER_LEN, 0.0), 0.0045);
+  float c = sdCapsule(q, ring, vec3(0.0, CENSER_LEN, 0.0), 0.003);
   for (int i = 0; i < 3; i++) {
     float a = float(i) * 2.0944 + 0.5;
-    c = min(c, sdCapsule(q, vec3(cos(a) * 0.08, 0.004, sin(a) * 0.08), ring, 0.0032));
+    c = min(c, sdCapsule(q, vec3(cos(a) * 0.08, 0.004, sin(a) * 0.08), ring, 0.0022));
   }
-  c = min(c, sdTorus(q - ring, vec2(0.016, 0.004)));
+  c = min(c, sdTorus(q - ring, vec2(0.014, 0.003)));
   chain = c;
   return min(body, c);
 }
@@ -42,8 +42,8 @@ vec3 shadeCenser(Censer cz, vec3 p, vec3 rd) {
   bool isChain = chain <= d + 1e-5;
   vec3 n = cz.basis * nl;
   vec3 v = -rd;
-  vec3 alb = isChain ? vec3(0.07, 0.06, 0.05) : vec3(0.62, 0.42, 0.17) * (0.8 + 0.3 * noise3(q * 120.0));
-  float rough = isChain ? 0.5 : 0.3;
+  vec3 alb = isChain ? vec3(0.3, 0.21, 0.1) : vec3(0.62, 0.42, 0.17) * (0.8 + 0.3 * noise3(q * 120.0));
+  float rough = isChain ? 0.4 : 0.3;
 
   vec3 col = alb * vec3(0.02, 0.018, 0.016) * (0.6 + 0.4 * n.y);
   for (int c = uZero; c < N_CLUSTERS; c++) {

@@ -2,8 +2,8 @@ import { prefersReducedMotion } from '../lib/dom';
 import type { Colours, LiveRenderer } from './live';
 import { BACKDROP_DIR, currentPoster, STILL_TIME, TALL, TALL_QUERY, WIDE, type Poster } from './posters';
 
-/** Shortest gap between drawn frames, in ms: about 30 fps, then about 20 once the GPU falls behind. */
-const GAP = { full: 30, slow: 46 };
+/** Shortest gaps between drawn frames, in ms: about 60 fps, then 30 and 20 as the GPU falls behind. */
+const GAPS = [12, 30, 46];
 /** Frames judged before deciding whether the GPU keeps up, and how many of them may be late. */
 const JUDGE = { frames: 40, late: 8 };
 
@@ -28,8 +28,8 @@ export function backdropMarkup(): string {
  * The overlay draws only while the hero is on screen, the tab is visible and
  * the archive screen is not filling the tab. It is never started with reduced
  * motion, when the browser asks to save data, or without WebGL2. When frames
- * keep arriving late it drops to about 20 fps, then stops and leaves the
- * image.
+ * keep arriving late it drops to about 30 fps, then 20, then stops and leaves
+ * the image.
  */
 export class Backdrop {
   private img: HTMLImageElement;
@@ -40,7 +40,8 @@ export class Backdrop {
   private onScreen = true;
   private dimmed = document.documentElement.classList.contains('is-dimmed');
   private t0 = 0;
-  private gap: number = GAP.full;
+  /** Which of GAPS the overlay draws at. */
+  private pace = 0;
   private lastDraw = 0;
   /** Set when a frame came due while the GPU was still busy. */
   private waited = false;
@@ -101,7 +102,7 @@ export class Backdrop {
 
   private restart(): void {
     this.teardown();
-    this.gap = GAP.full;
+    this.pace = 0;
     this.judged = { frames: 0, late: 0 };
     void this.begin();
   }
@@ -117,7 +118,7 @@ export class Backdrop {
     try {
       live.prepare();
       if (!live.ready) return this.wake();
-      if (now - this.lastDraw >= this.gap) {
+      if (now - this.lastDraw >= GAPS[this.pace]) {
         if (!live.idle()) {
           this.waited = true;
         } else {
@@ -143,7 +144,7 @@ export class Backdrop {
     const tooSlow = this.judged.late > JUDGE.late;
     this.judged = { frames: 0, late: 0 };
     if (!tooSlow) return;
-    if (this.gap === GAP.full) this.gap = GAP.slow;
+    if (this.pace < GAPS.length - 1) this.pace++;
     else this.stop();
   }
 
