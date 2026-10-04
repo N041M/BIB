@@ -60,24 +60,40 @@ fine scratches.
 ## The scene behind the hero
 
 The hero sits in front of a candlelit corridor where a servitor swings a
-censer. Hand-written WebGL2 shaders draw it in the browser. It uses no image
-files and no three.js, and it loads after the rest of the page has appeared.
+censer. The project's own WebGL2 shaders render the corridor, and the page
+shows the result as an ordinary image: a WebP of 25 to 50 KB, preloaded with
+the page. Landscape and portrait screens get different images, each in two
+sizes.
 
-The camera never moves, so the corridor is rendered once when the page loads
-and then refined over the next few frames. Each frame relights that picture
-with the candle flicker, draws the censer and its smoke, and adds the light
-shafts, dust and flames.
+Once the page has loaded and gone idle, a small WebGL overlay takes over on
+top of the same image. It makes the candle light flicker, and draws the
+flames, the swinging censer, its smoke and the dust in the light. It starts
+from a copy of the image without those parts, plus two small maps that hold
+the depth and how much each group of candles lights each pixel. It never
+renders the hall itself. Its code is about 16 KB and its images about 110 KB.
 
-It stops drawing when the hero is scrolled out of view, when the tab is hidden
-and while the archive screen is open. With reduced motion it draws one still
-frame. If the GPU cannot keep up, it drops to 30 frames per second and then to
-a lower resolution. Without WebGL2 the hero keeps its plain dark background.
+The overlay draws only while the hero is on screen, the tab is visible and
+the archive screen is closed. It is not started with reduced motion, when the
+browser asks to save data, or without WebGL2. When frames keep arriving late,
+it drops to about 20 frames per second and then stops, which leaves the image.
+
+The scene is defined in code:
 
 - `src/backdrop/scene.ts`: the hall's measurements, where the servitor stands,
   every candle, the censer's swing and the camera.
 - `src/backdrop/shaders/hall.glsl` and `servitor.glsl`: the shapes and
   materials of the hall and the servitor.
-- `src/backdrop/shaders/frame.frag`: the haze, light shafts, smoke and censer.
+- `src/backdrop/shaders/air.frag`, `smoke.glsl` and `censer.glsl`: the haze,
+  light shafts, smoke and censer.
+
+After changing any of them, render the images again. Run `npm run dev`, open
+`http://localhost:5173/?render-backdrop` and wait for `saved`. The studio
+renders every image into `public/backdrop/`, and the page then reloads and
+shows them. It takes a few seconds on a recent GPU.
+
+The version that rendered the whole scene in the browser on every visit is
+archived as `gothic-corridor/` in
+[N041M/cool-stuff-n-assets](https://github.com/N041M/cool-stuff-n-assets).
 
 ## Run it
 
@@ -148,10 +164,12 @@ src/
   state/cart.ts        cart store (localStorage)
   lib/                 DOM helpers, cancellable timeline, text scramble
   backdrop/
-    index.ts           the scene behind the hero: when it draws and when it slows down
-    renderer.ts        WebGL2 passes: bake, frame, flames, bloom and the final grade
+    index.ts           the image behind the hero, and when the overlay starts, slows or stops
+    live.ts            the overlay: flicker, flames, censer, smoke and dust over the image
+    posters.ts         the rendered images: names, sizes and which screens get which
     scene.ts           the hall, the servitor, the censer, the candles and the camera
-    shaders/           GLSL for each pass
+    studio/            development only: renders the images (/?render-backdrop)
+    shaders/           GLSL for the studio and the overlay
   three/
     models.ts          STL loading, normalising, caching
     phosphor.ts        phosphor / x-ray shader

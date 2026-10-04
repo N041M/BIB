@@ -122,45 +122,6 @@ float sdRoundCone(vec3 p, vec3 a, vec3 b, float r1, float r2) {
   return (sqrt(x2 * a2 * il2) + y * rr) * il2 - r1;
 }
 
-// Quadratic bezier tube, after Inigo Quilez.
-vec2 sdBezier(vec3 pos, vec3 A, vec3 B, vec3 C) {
-  vec3 a = B - A;
-  vec3 b = A - 2.0 * B + C;
-  vec3 c = a * 2.0;
-  vec3 d = A - pos;
-  float kk = 1.0 / dot(b, b);
-  float kx = kk * dot(a, b);
-  float ky = kk * (2.0 * dot(a, a) + dot(d, b)) / 3.0;
-  float kz = kk * dot(d, a);
-  vec2 res;
-  float p = ky - kx * kx;
-  float p3 = p * p * p;
-  float q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
-  float h = q * q + 4.0 * p3;
-  if (h >= 0.0) {
-    h = sqrt(h);
-    vec2 x = (vec2(h, -h) - q) / 2.0;
-    vec2 uv = sign(x) * pow(abs(x), vec2(1.0 / 3.0));
-    float t = clamp(uv.x + uv.y - kx, 0.0, 1.0);
-    vec3 w = d + (c + b * t) * t;
-    res = vec2(dot(w, w), t);
-  } else {
-    float z = sqrt(-p);
-    float v = acos(q / (p * z * 2.0)) / 3.0;
-    float m = cos(v);
-    float n = sin(v) * 1.732050808;
-    vec3 t = clamp(vec3(m + m, -n - m, n - m) * z - kx, 0.0, 1.0);
-    vec3 w = d + (c + b * t.x) * t.x;
-    float dis = dot(w, w);
-    res = vec2(dis, t.x);
-    w = d + (c + b * t.y) * t.y;
-    dis = dot(w, w);
-    if (dis < res.x) res = vec2(dis, t.y);
-  }
-  res.x = sqrt(res.x);
-  return res;
-}
-
 float smin(float a, float b, float k) {
   float h = max(k - abs(a - b), 0.0) / k;
   return min(a, b) - h * h * k * 0.25;
@@ -192,6 +153,10 @@ const float SW_YS = 6.0;
 const float SW_FR = 0.06;
 const float SW_CY = 6.75;
 const float XG = HALL_W + WALL_T * 0.5;
+
+// Range of the depth stored in the maps for the live overlay, on a log scale.
+const float DEPTH_NEAR = 0.3;
+const float DEPTH_FAR = 64.0;
 
 // The opening through the wall. splay widens it toward the inside face.
 float sdSideOpening(vec2 q, float splay) {
@@ -313,6 +278,11 @@ vec3 windowLight(vec3 p, float blur, out float bay) {
   bay = -1.0;
   return m * endGlassTint(w, soft + blur);
 }
+
+// The light volume covers the hall up to 10 m, where the shafts end. The
+// renderer bakes windowLight and pierShadow into it once.
+const vec3 VOL_MIN = vec3(-HALL_W, 0.0, END_Z);
+const vec3 VOL_SIZE = vec3(2.0 * HALL_W, 10.0, Z0 + 1.5 - END_Z);
 
 // The piers on the right-hand wall, as boxes, for shadows in the air.
 float pierShadow(vec3 p) {

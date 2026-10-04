@@ -3,8 +3,6 @@
 
 layout(location = 0) out vec4 oColor;
 
-uniform sampler2D uDay;
-uniform sampler2D uAlbedo;
 uniform float uTime;
 uniform vec4 uFlicker;
 uniform vec3 uAccent;
@@ -16,6 +14,31 @@ in float vFog;
 in vec3 vColor;
 flat in vec4 vInfo;
 
+#ifdef LIVE
+// The live overlay knows the scene only from the depth map.
+uniform sampler2D uDepth;
+
+float sceneDepth(ivec2 px) {
+  return DEPTH_NEAR * exp(texture(uDepth, (vec2(px) + 0.5) / uRes).r * log(DEPTH_FAR / DEPTH_NEAR));
+}
+
+float floorGloss(ivec2 px) {
+  vec3 p = uCamPos + cameraRay(vec2(px) + 0.5) * sceneDepth(px);
+  return p.y < 0.03 && abs(p.x) > 0.86 ? 0.45 : 0.0;
+}
+#else
+uniform sampler2D uDay;
+uniform sampler2D uAlbedo;
+
+float sceneDepth(ivec2 px) {
+  return texelFetch(uDay, px, 0).a;
+}
+
+float floorGloss(ivec2 px) {
+  return texelFetch(uAlbedo, px, 0).a;
+}
+#endif
+
 void main() {
   ivec2 px = ivec2(gl_FragCoord.xy);
   float kind = vInfo.z;
@@ -24,12 +47,12 @@ void main() {
   vec2 q = vUv;
 
   if (kind == 1.0) {
-    float gloss = texelFetch(uAlbedo, px, 0).a;
+    float gloss = floorGloss(px);
     if (gloss < 0.02) discard;
     q.y = -q.y * 0.45;
     q.x *= 0.8;
     gain *= gloss * 0.4;
-  } else if (texelFetch(uDay, px, 0).a < vDist - 0.12) {
+  } else if (sceneDepth(px) < vDist - 0.12) {
     discard;
   }
 

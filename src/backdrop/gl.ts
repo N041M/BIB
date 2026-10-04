@@ -65,7 +65,7 @@ function shader(gl: WebGL2RenderingContext, type: number, source: string): WebGL
   return s;
 }
 
-/** A framebuffer with one or more half-float colour textures. */
+/** A framebuffer with one or more colour textures, half-float unless `format` says otherwise. */
 export interface Target {
   fb: WebGLFramebuffer;
   tex: WebGLTexture[];
@@ -73,14 +73,14 @@ export interface Target {
   h: number;
 }
 
-export function createTarget(gl: WebGL2RenderingContext, w: number, h: number, count: number, linear: boolean): Target {
+export function createTarget(gl: WebGL2RenderingContext, w: number, h: number, count: number, linear: boolean, format: number = gl.RGBA16F): Target {
   const fb = gl.createFramebuffer()!;
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
   const tex: WebGLTexture[] = [];
   for (let i = 0; i < count; i++) {
     const t = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, t);
-    gl.texStorage2D(gl.TEXTURE_2D, 1, gl.RGBA16F, w, h);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, format, w, h);
     const filter = linear ? gl.LINEAR : gl.NEAREST;
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);

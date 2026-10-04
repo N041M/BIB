@@ -1,6 +1,5 @@
-// The static scene, for the bake pass: geometry, materials and the shadow,
-// normal and occlusion helpers. Comes after common.glsl, and servitor.glsl
-// follows it.
+// The static scene, for the bake pass: geometry and materials. Comes after
+// common.glsl, and servitor.glsl follows it.
 
 #define M_STONE 1.0
 #define M_TRACERY 2.0
@@ -214,45 +213,6 @@ vec2 map(vec3 p) {
 
   res = servitor(p, res);
   return res;
-}
-
-vec3 calcNormal(vec3 p, float t) {
-  float e = 0.0004 * max(1.0, t * 0.6);
-  vec3 n = vec3(0.0);
-  for (int i = uZero; i < 4; i++) {
-    vec3 s = 0.5773 * (2.0 * vec3(float(((i + 3) >> 1) & 1), float((i >> 1) & 1), float(i & 1)) - 1.0);
-    n += s * map(p + e * s).x;
-  }
-  return normalize(n);
-}
-
-float calcAO(vec3 p, vec3 n) {
-  float occ = 0.0;
-  float sca = 1.0;
-  for (int i = uZero; i < 7; i++) {
-    float h = 0.015 + 0.6 * pow(float(i) / 6.0, 2.0);
-    float d = map(p + h * n).x;
-    occ += (h - d) * sca;
-    sca *= 0.82;
-  }
-  return clamp(1.0 - 1.6 * occ, 0.0, 1.0);
-}
-
-float softShadow(vec3 ro, vec3 rd, float tmax, float k) {
-  float res = 1.0;
-  float t = 0.015;
-  float ph = 1e10;
-  for (int i = uZero; i < 72; i++) {
-    float h = map(ro + rd * t).x;
-    float y = h * h / (2.0 * ph);
-    float d = sqrt(max(h * h - y * y, 0.0));
-    res = min(res, k * d / max(0.0, t - y));
-    ph = h;
-    t += clamp(h, 0.01, 0.45);
-    if (res < 0.003 || t > tmax) break;
-  }
-  res = clamp(res, 0.0, 1.0);
-  return res * res * (3.0 - 2.0 * res);
 }
 
 /* ───────────── materials ───────────── */

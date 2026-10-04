@@ -13,3 +13,8 @@ import { THEME } from './config';
 
 document.documentElement.dataset.phosphor = THEME.phosphor;
 new App(document.getElementById('app')!).start();
+
+// Development only: re-render the backdrop images into public/backdrop/.
+if (import.meta.env.DEV && new URLSearchParams(location.search).has('render-backdrop')) {
+  void import('./backdrop/studio/render').then(({ renderBackdrop }) => renderBackdrop());
+}

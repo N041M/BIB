@@ -1,3 +1,4 @@
+import { backdropMarkup } from '../backdrop';
 import { BRAND, CREATOR } from '../config';
 import { esc, fromHTML, prefersReducedMotion, qs, qsa } from '../lib/dom';
 import { archiveDate, clock } from '../lib/format';
@@ -101,8 +102,7 @@ export class Page {
   private template(): string {
     const year = new Date().getFullYear();
     return /* html */ `
-<div class="page">
-  <div class="backdrop" aria-hidden="true"></div>
+<div class="page">${backdropMarkup()}
   <header class="bar">
     <a class="bar__brand" href="#top">${MARK}<span>${BRAND.name}</span></a>
     <nav class="bar__nav" aria-label="Sections">

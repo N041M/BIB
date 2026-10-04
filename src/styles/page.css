@@ -1,6 +1,6 @@
 /* ───────────────── Scene behind the hero ───────────────── */
 
-/* Until the first frame is ready, a warm glow stands in where the candles will be. */
+/* The image and the animation over it are cropped the same way, so they line up. */
 .backdrop {
   position: absolute;
   inset: 0 0 auto;
@@ -8,23 +8,25 @@
   min-height: 540px;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 30% 26% at 72% 64%, rgb(150 52 24 / 0.16), transparent 70%),
-    radial-gradient(ellipse 22% 40% at 60% 38%, rgb(150 165 160 / 0.05), transparent 70%),
-    var(--bg);
+  background: var(--bg);
 }
 
+.backdrop__poster,
 .backdrop__canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 1.8s ease;
+  object-position: 72% 45%;
 }
 
-.backdrop.is-ready .backdrop__canvas {
+.backdrop__canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.backdrop.is-live .backdrop__canvas {
   opacity: 1;
 }
 

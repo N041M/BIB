@@ -84,7 +84,7 @@ vec2 servitor(vec3 p, vec2 res) {
   plate = min(plate, sdCylY(e.xzy, 0.02, 0.022) - 0.002);
   float jaw = sdRoundBox(q - vec3(0.0, 1.448, 0.268), vec3(0.046, 0.03, 0.032), 0.01);
   vec3 tq = vec3(abs(q.x), q.y, q.z);
-  jaw = min(jaw, sdBezier(tq, vec3(0.03, 1.435, 0.285), vec3(0.06, 1.38, 0.3), vec3(0.075, 1.3, 0.21)).x - 0.009);
+  jaw = min(jaw, min(sdCapsule(tq, vec3(0.03, 1.435, 0.285), vec3(0.056, 1.374, 0.274), 0.009), sdCapsule(tq, vec3(0.056, 1.374, 0.274), vec3(0.075, 1.3, 0.21), 0.009)));
   res = opU(res, vec2(min(plate, jaw), M_GUNMETAL));
   res = opU(res, vec2(sdCylY((e - vec3(0.0, 0.0, 0.023)).xzy, 0.014, 0.003), M_LENS));
 
@@ -94,7 +94,7 @@ vec2 servitor(vec3 p, vec2 res) {
   pack = min(pack, sdCylY(sq, 0.026, 0.065) - 0.003);
   pack = min(pack, sdCylY(sq - vec3(0.0, 0.066, 0.0), 0.042, 0.004));
   res = opU(res, vec2(pack, M_GUNMETAL));
-  float cable = sdBezier(tq, vec3(0.05, 1.44, -0.16), vec3(0.075, 1.63, -0.1), vec3(0.04, 1.56, 0.03)).x - 0.013;
+  float cable = min(sdCapsule(tq, vec3(0.05, 1.44, -0.16), vec3(0.06, 1.565, -0.083), 0.013), sdCapsule(tq, vec3(0.06, 1.565, -0.083), vec3(0.04, 1.56, 0.03), 0.013));
   cable = min(cable, sdTorus(vec3(q.x / 1.12, q.y - 1.0, q.z - 0.02), vec2(0.205, 0.012)));
   res = opU(res, vec2(cable, M_CABLE));
 
