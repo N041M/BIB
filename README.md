@@ -56,6 +56,28 @@ fine scratches.
 - **Accessibility.** Real buttons and dialogs, focus trapping, Esc to close,
   and `prefers-reduced-motion` support (no flicker, a plain cut to the store).
 
+## The scene behind the hero
+
+The hero sits in front of a candlelit corridor where a servitor swings a
+censer. Hand-written WebGL2 shaders draw it in the browser. It uses no image
+files and no three.js, and it loads after the rest of the page has appeared.
+
+The camera never moves, so the corridor is rendered once when the page loads
+and then refined over the next few frames. Each frame relights that picture
+with the candle flicker, draws the censer and its smoke, and adds the light
+shafts, dust and flames.
+
+It stops drawing when the hero is scrolled out of view, when the tab is hidden
+and while the archive screen is open. With reduced motion it draws one still
+frame. If the GPU cannot keep up, it drops to 30 frames per second and then to
+a lower resolution. Without WebGL2 the hero keeps its plain dark background.
+
+- `src/backdrop/scene.ts`: the hall's measurements, where the servitor stands,
+  every candle, the censer's swing and the camera.
+- `src/backdrop/shaders/hall.glsl` and `servitor.glsl`: the shapes and
+  materials of the hall and the servitor.
+- `src/backdrop/shaders/frame.frag`: the haze, light shafts, smoke and censer.
+
 ## Run it
 
 ```bash
@@ -108,7 +130,8 @@ breaking.
 - `src/config.ts`: brand name, domain, terminal name, currency/locale and
   licence terms.
 - `THEME.phosphor` in `src/config.ts`: `'red'` or `'green'`. It switches the
-  page accent, the screen and the 3D models together.
+  page accent, the screen and the 3D models together, along with the glass of
+  the votive cups and the servitor's optic in the scene behind the hero.
 - `src/styles/base.css`: both palettes, as CSS variables (`--p-*` is the
   phosphor ramp on the screen).
 - `src/three/phosphor.ts`: the model shader. It reads its colours from the same CSS variables.
@@ -123,6 +146,11 @@ src/
   data/gallery.ts      gallery photos
   state/cart.ts        cart store (localStorage)
   lib/                 DOM helpers, cancellable timeline, text scramble
+  backdrop/
+    index.ts           the scene behind the hero: when it draws and when it slows down
+    renderer.ts        WebGL2 passes: bake, frame, flames, bloom and the final grade
+    scene.ts           the hall, the servitor, the censer, the candles and the camera
+    shaders/           GLSL for each pass
   three/
     models.ts          STL loading, normalising, caching
     phosphor.ts        phosphor / x-ray shader

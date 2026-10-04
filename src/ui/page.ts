@@ -17,19 +17,22 @@ export interface PageCallbacks {
 const MARK = `<svg class="mark" viewBox="0 0 20 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 23V11.5C3 6.8 6 3.3 10 1.5c4 1.8 7 5.3 7 10V23"/><path d="M7 23V12.5c0-2.6 1.2-4.6 3-5.8 1.8 1.2 3 3.2 3 5.8V23" opacity=".55"/><path d="M0 23h20"/></svg>`;
 
 /**
- * Everything outside the screen: the top bar, the hero, the section that
- * holds the screen, the gallery and the footer.
+ * Everything outside the screen: the top bar, the hero and the scene behind
+ * it, the section that holds the screen, the gallery and the footer.
  */
 export class Page {
   readonly el: HTMLElement;
   /** The glass the screen module mounts into. */
   readonly glass: HTMLElement;
+  /** The element the corridor scene behind the hero draws into. */
+  readonly backdrop: HTMLElement;
   private archive: HTMLElement;
   private clockTimer = 0;
 
   constructor(cb: PageCallbacks) {
     this.el = fromHTML(this.template());
     this.glass = qs(this.el, '.crt');
+    this.backdrop = qs(this.el, '.backdrop');
     this.archive = qs(this.el, '#archive');
     this.archive.after(new Gallery().el);
 
@@ -99,6 +102,7 @@ export class Page {
     const year = new Date().getFullYear();
     return /* html */ `
 <div class="page">
+  <div class="backdrop" aria-hidden="true"></div>
   <header class="bar">
     <a class="bar__brand" href="#top">${MARK}<span>${BRAND.name}</span></a>
     <nav class="bar__nav" aria-label="Sections">

@@ -20,7 +20,7 @@ function parse(hash: string): Route {
  *   #/archive/<slug>    a pattern open in the inspector
  *
  * The hero ships without three.js. The screen and the 3D engine load in the
- * background right after first paint.
+ * background right after first paint, and so does the scene behind the hero.
  */
 export class App {
   private page: Page;
@@ -51,6 +51,9 @@ export class App {
 
   start(): void {
     this.page.start();
+    import('./backdrop')
+      .then(({ Backdrop }) => new Backdrop(this.page.backdrop).start())
+      .catch((err) => console.warn('[backdrop]', err));
     window.addEventListener('hashchange', () => this.sync());
     const route = parse(location.hash);
     if (route.name === 'archive') {
