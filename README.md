@@ -1,6 +1,9 @@
 # Based in Battle · Pattern Archive
 
 A storefront for licensed STL miniatures ([basedinbattle.com](https://basedinbattle.com)).
+The current build is live on GitHub Pages at
+[n041m.github.io/BIB](https://n041m.github.io/BIB/).
+
 The page has a hero at the top and a cogitator screen below it, styled after
 the single-colour phosphor terminals in grimdark gothic sci-fi. The screen waits in
 standby with a flashing "READY FOR USE" message. Activating it starts the
@@ -68,9 +71,10 @@ The build uses a relative `base`, so `dist/` can be served from any sub-path
 ## GitHub Pages and the custom domain
 
 `.github/workflows/deploy-pages.yml` builds the site and publishes `dist/` to
-GitHub Pages on every push to `main`, or on demand from the Actions tab. Setup is one-time: in **Settings → Pages → Build and deployment**,
-set **Source** to **GitHub Actions**. The site is then served at
-`https://<owner>.github.io/<repo>/`.
+GitHub Pages on every push to `main`, or on demand from the Actions tab.
+Before the first deploy, set **Source** to **GitHub Actions** in
+**Settings → Pages → Build and deployment**. The site is served at
+[https://n041m.github.io/BIB/](https://n041m.github.io/BIB/).
 
 To serve it from `basedinbattle.com`:
 
