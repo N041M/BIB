@@ -31,7 +31,7 @@ html.is-dimmed .foot {
   align-items: center;
   gap: clamp(12px, 2vw, 28px);
   padding: 0 var(--gutter);
-  background: rgb(7 9 8 / 0.84);
+  background: rgb(var(--bg-rgb) / 0.84);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--line);
@@ -215,8 +215,8 @@ html.is-dimmed .foot {
 }
 
 .btn--primary:hover {
-  border-color: #b9f3b3;
-  background: #b9f3b3;
+  border-color: var(--accent-hi);
+  background: var(--accent-hi);
 }
 
 .link {

@@ -9,5 +9,7 @@ import './styles/crt.css';
 import './styles/term.css';
 import './styles/overlays.css';
 import { App } from './app';
+import { THEME } from './config';
 
+document.documentElement.dataset.phosphor = THEME.phosphor;
 new App(document.getElementById('app')!).start();

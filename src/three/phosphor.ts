@@ -1,14 +1,17 @@
 import * as THREE from 'three';
 
-/** Palette for the cogitator screen, in sRGB hex: a single green phosphor from black to overexposed. */
+const css = getComputedStyle(document.documentElement);
+const token = (name: string, fallback: string) => new THREE.Color(css.getPropertyValue(name).trim() || fallback);
+
+/** Palette for the screen: one phosphor from black to overexposed, read from the CSS variables in base.css. */
 export const PHOSPHOR = {
-  dark: new THREE.Color('#010502'),
-  lit: new THREE.Color('#8ee68a'),
-  rim: new THREE.Color('#d6f9cd'),
-  hot: new THREE.Color('#f0ffec'),
-  line: new THREE.Color('#62b562'),
-  lineDim: new THREE.Color('#2b5c30'),
-  bright: new THREE.Color('#bdf5b4'),
+  dark: token('--p-dark', '#070101'),
+  lit: token('--p', '#ff5a43'),
+  rim: token('--p-hi', '#ffd6ca'),
+  hot: token('--p-hot', '#fff1ec'),
+  line: token('--p-2', '#d24433'),
+  lineDim: token('--p-3', '#8c2c22'),
+  bright: token('--p-hi', '#ffd6ca'),
 };
 
 const vertexShader = /* glsl */ `

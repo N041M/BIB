@@ -310,7 +310,7 @@
 .cart__scrim {
   position: absolute;
   inset: 0;
-  background: rgb(2 6 3 / 0.72);
+  background: rgb(var(--p-bg-rgb) / 0.72);
   opacity: 0;
   transition: opacity 0.2s steps(3);
 }

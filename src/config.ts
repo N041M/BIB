@@ -30,6 +30,9 @@ export const CREATOR = {
   url: 'https://www.twitch.tv/rude_raccoon',
 };
 
+/** Which phosphor the screen and the page accent use. Both palettes are in src/styles/base.css. */
+export const THEME: { phosphor: 'red' | 'green' } = { phosphor: 'red' };
+
 export type LicenceId = 'personal' | 'merchant';
 
 export interface Licence {

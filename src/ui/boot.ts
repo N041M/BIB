@@ -426,9 +426,11 @@ export class Telemetry {
     }
     const ctx = c.getContext('2d');
     if (!ctx) return;
-    ctx.fillStyle = 'rgba(3, 8, 5, 0.34)';
+    const css = getComputedStyle(c);
+    const p = css.getPropertyValue('--p-rgb').trim();
+    ctx.fillStyle = `rgb(${css.getPropertyValue('--p-bg-rgb').trim()} / 0.34)`;
     ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = 'rgba(142, 230, 138, 0.18)';
+    ctx.strokeStyle = `rgb(${p} / 0.18)`;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, h / 2);
@@ -438,9 +440,9 @@ export class Telemetry {
     const env = Math.min(1, t / 500);
     const jitter = 0.5 * (1 - progress) + 0.06;
     const ph = t / 110;
-    ctx.strokeStyle = 'rgba(190, 245, 180, 0.95)';
+    ctx.strokeStyle = css.getPropertyValue('--p-hi').trim();
     ctx.lineWidth = 1.3 * dpr;
-    ctx.shadowColor = 'rgba(142, 230, 138, 0.9)';
+    ctx.shadowColor = `rgb(${p} / 0.9)`;
     ctx.shadowBlur = 6 * dpr;
     ctx.beginPath();
     for (let x = 0; x <= w; x += 2 * dpr) {

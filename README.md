@@ -2,7 +2,7 @@
 
 A storefront for licensed STL miniatures ([basedinbattle.com](https://basedinbattle.com)).
 The page has a hero at the top and a cogitator screen below it, styled after
-the green phosphor terminals in grimdark gothic sci-fi. The screen waits in
+the single-colour phosphor terminals in grimdark gothic sci-fi. The screen waits in
 standby with a flashing "READY FOR USE" message. Activating it starts the
 archive in five steps:
 
@@ -41,8 +41,9 @@ fine scratches.
   dimensions, triangle count and file size read from the actual STL.
 - **Sections.** Archive, Licences, Printing and FAQ are tabs in the
   terminal. Keys **1** to **4** switch between them.
-- **Gallery.** Painted models in full colour below the screen, with a viewer
-  that shows one photo at a time (arrow keys to step through, Esc to close).
+- **Gallery.** Painted models in full colour below the screen. A photo grows
+  out of its tile into a viewer and shrinks back into it on close. Arrow keys
+  step through the photos and Esc closes the viewer.
   Put the photos in `public/gallery/` and list them in `src/data/gallery.ts`.
 - **Licences.** Personal or Merchant per model, with a requisition drawer
   (stored in `localStorage`) and a simulated checkout. No payment is taken.
@@ -102,9 +103,11 @@ breaking.
 
 - `src/config.ts`: brand name, domain, terminal name, currency/locale and
   licence terms.
-- `src/styles/base.css`: the page palette and the phosphor ramp (`--p-*`)
-  used on the screen.
-- `src/three/phosphor.ts`: the model shader and its green palette.
+- `THEME.phosphor` in `src/config.ts`: `'red'` or `'green'`. It switches the
+  page accent, the screen and the 3D models together.
+- `src/styles/base.css`: both palettes, as CSS variables (`--p-*` is the
+  phosphor ramp on the screen).
+- `src/three/phosphor.ts`: the model shader. It reads its colours from the same CSS variables.
 
 ## Layout
 

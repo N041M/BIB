@@ -173,17 +173,30 @@
 .viewer[open] {
   display: grid;
   place-items: center;
-  animation: viewer-in 0.25s ease both;
 }
 
 .viewer::backdrop {
-  background: rgb(4 5 4 / 0.94);
+  background: rgb(var(--bg-rgb) / 0.94);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
 
-@keyframes viewer-in {
+.viewer[open]::backdrop {
+  animation: backdrop-in 0.24s ease both;
+}
+
+.viewer.is-closing::backdrop {
+  animation: backdrop-out 0.26s ease both;
+}
+
+@keyframes backdrop-in {
   from {
+    opacity: 0;
+  }
+}
+
+@keyframes backdrop-out {
+  to {
     opacity: 0;
   }
 }
@@ -197,6 +210,8 @@
 }
 
 .viewer__frame {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
 }
@@ -288,7 +303,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .viewer[open] {
+  .viewer[open]::backdrop,
+  .viewer.is-closing::backdrop {
     animation: none;
   }
   .shot__img {

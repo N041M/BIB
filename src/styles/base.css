@@ -1,6 +1,42 @@
+/*
+ * Two palettes, picked with THEME.phosphor in src/config.ts. Each one sets the
+ * page around the screen (black glass and bone, with the phosphor as the one
+ * accent) and the phosphor ramp on the screen, from overexposed to barely lit.
+ * The 3D models read the same variables.
+ */
 :root {
-  /* the page around the screen: black glass and bone, with the phosphor green as the one accent */
+  /* red */
+  --bg: #090606;
+  --bg-rgb: 9 6 6;
+  --bg-2: #0c0807;
+  --surface: #120c0b;
+  --line: #241a18;
+  --line-2: #362926;
+  --ink: #e8e1d9;
+  --ink-2: #b1a79e;
+  --muted: #7b6f68;
+  --accent: #ff5a43;
+  --accent-hi: #ff9a87;
+  --accent-ink: #160403;
+
+  --p-rgb: 255 90 67;
+  --p-hot: #fff1ec;
+  --p-hi: #ffd6ca;
+  --p: #ff5a43;
+  --p-2: #d24433;
+  --p-3: #8c2c22;
+  --p-4: #46160f;
+  --p-bg: #0b0303;
+  --p-bg-rgb: 11 3 3;
+  --p-dark: #070101;
+  --glass-1: #150a09;
+  --glass-2: #0c0606;
+  --glass-3: #050202;
+}
+
+:root[data-phosphor='green'] {
   --bg: #070908;
+  --bg-rgb: 7 9 8;
   --bg-2: #0a0d0b;
   --surface: #0d110e;
   --line: #1a211c;
@@ -9,17 +45,25 @@
   --ink-2: #a8ae9f;
   --muted: #6c7669;
   --accent: #8ee68a;
+  --accent-hi: #b9f3b3;
   --accent-ink: #051007;
 
-  /* the screen: one phosphor, from overexposed to barely lit */
   --p-rgb: 142 230 138;
+  --p-hot: #f0ffec;
   --p-hi: #dcfbd3;
   --p: #8ee68a;
   --p-2: #67b866;
   --p-3: #417a43;
   --p-4: #1f3d23;
   --p-bg: #030805;
+  --p-bg-rgb: 3 8 5;
+  --p-dark: #010502;
+  --glass-1: #0b120d;
+  --glass-2: #070b08;
+  --glass-3: #030504;
+}
 
+:root {
   --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
   --font-mono: 'Share Tech Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;

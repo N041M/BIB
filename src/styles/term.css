@@ -41,7 +41,7 @@
 
 .tui__exit {
   padding: 0 0.8ch;
-  border: 1px solid rgb(3 8 5 / 0.5);
+  border: 1px solid rgb(var(--p-bg-rgb) / 0.5);
   background: none;
   color: var(--p-bg);
   text-shadow: none !important;
