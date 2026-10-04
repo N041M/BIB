@@ -90,6 +90,11 @@ export class Store {
     this.syncCart();
   }
 
+  /** Fetch every model. Nothing is downloaded until the screen comes into view or opens. */
+  loadModels(): void {
+    this.cards.forEach((c) => c.load());
+  }
+
   /** The screen is on and in view. */
   activate(): void {
     this.tick();

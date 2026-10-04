@@ -3,7 +3,6 @@ import { PRODUCTS, type Product } from '../data/catalog';
 import { prefersReducedMotion, qs } from '../lib/dom';
 import { archiveDate, clock, pad } from '../lib/format';
 import { easeInOutCubic, Sequence, tween } from '../lib/sequence';
-import { prefetchModels } from '../three/models';
 import { SharedRenderer } from '../three/renderer';
 import { afterglow, clearScripted, degauss, play, powerOff, powerOn, rasterDraw, Telemetry, WAVE_FILTER } from './boot';
 import { CartDrawer } from './cart';
@@ -101,10 +100,16 @@ ${WAVE_FILTER}`;
     qs(glass, '.crt__skip').addEventListener('click', () => this.seq?.skip());
     document.addEventListener('keydown', (e) => this.onKey(e));
 
-    // warm the model cache while the visitor reads the hero
-    const idle = () => prefetchModels(PRODUCTS.map((p) => p.file));
-    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(idle, { timeout: 3000 });
-    else window.setTimeout(idle, 1500);
+    // fetch the models once the screen scrolls into view, not on every visit
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+    if (!saveData) {
+      const near = new IntersectionObserver(([entry]) => {
+        if (!entry.isIntersecting) return;
+        near.disconnect();
+        this.store.loadModels();
+      }, { threshold: 0.1 });
+      near.observe(glass);
+    }
 
     this.tickStandby();
     window.setInterval(() => this.tickStandby(), 1000);
@@ -117,6 +122,7 @@ ${WAVE_FILTER}`;
 
   activate(opts: ActivateOptions = {}): void {
     if (this.state !== 'standby') return;
+    this.store.loadModels();
     void this.run(opts);
   }
 

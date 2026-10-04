@@ -37,7 +37,8 @@ fine scratches.
 - **Interactive 3D on every card.** Drag to turn, hover to brighten. The
   models spin while idle. All cards share one WebGL context: a canvas sits
   behind the store markup and draws each model into its card's rectangle
-  with the scissor test.
+  with the scissor test. The models download only once the screen scrolls
+  into view or opens.
 - **Inspector** (`#/archive/<slug>`). Opens over the archive on the same
   screen. Orbit, zoom and pan, with **Solid / Wire / X-ray** render modes,
   live azimuth, elevation and zoom readouts, a millimetre scale bar, and

@@ -79,10 +79,3 @@ function placeholderGeometry(): THREE.BufferGeometry {
   g.computeVertexNormals();
   return g;
 }
-
-/** Warm the cache in the background without blocking anything. */
-export function prefetchModels(files: string[]): void {
-  const run = () => files.forEach((f) => void loadModel(f));
-  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(run, { timeout: 2000 });
-  else setTimeout(run, 300);
-}

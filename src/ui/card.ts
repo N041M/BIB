@@ -18,6 +18,7 @@ export class ProductCard {
   readonly view: StageView;
   private stage: ProductStage;
   private model?: ModelData;
+  private loading = false;
   private entered = false;
   private dragStart?: { x: number; y: number; yaw: number; pitch: number; moved: boolean; t: number };
 
@@ -35,7 +36,17 @@ export class ProductCard {
 
     if (!renderer.supported) viewEl.classList.add('is-offline');
 
-    loadModel(product.file).then((data) => {
+    this.bindViewport(viewEl);
+    qs(this.el, '[data-act="inspect"]').addEventListener('click', () => cb.onInspect(product));
+    qs(this.el, '[data-act="cart"]').addEventListener('click', () => cb.onToggleCart(product));
+  }
+
+  /** Fetch the model. The store asks for it once the screen is in view or opens. */
+  load(): void {
+    if (this.loading) return;
+    this.loading = true;
+    const viewEl = this.view.el;
+    loadModel(this.product.file).then((data) => {
       this.model = data;
       this.stage.setModel(data);
       if (this.entered) this.stage.build(1300);
@@ -43,10 +54,6 @@ export class ProductCard {
       qs(this.el, '[data-spec="tris"]').textContent = formatInt(data.triangles);
       viewEl.classList.add('is-loaded');
     });
-
-    this.bindViewport(viewEl);
-    qs(this.el, '[data-act="inspect"]').addEventListener('click', () => cb.onInspect(product));
-    qs(this.el, '[data-act="cart"]').addEventListener('click', () => cb.onToggleCart(product));
   }
 
   /** Stream the card in (called by the store intro, staggered). */
