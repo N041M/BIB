@@ -34,10 +34,7 @@ export class App {
   private inspectPushed = false;
 
   constructor(root: HTMLElement) {
-    this.page = new Page({
-      onTab: (tab, from) => this.enter(from, (screen) => screen.showTab(tab)),
-      onCart: (from) => this.enter(from, (screen) => screen.openCart()),
-    });
+    this.page = new Page({ onEnter: (from) => this.enter(from) });
     root.append(this.page.el);
     this.screenReady = import('./ui/screen').then(({ Screen }) => {
       const screen = new Screen(this.page.glass, {
@@ -52,7 +49,6 @@ export class App {
   }
 
   start(): void {
-    this.page.start();
     new Backdrop(this.page.backdrop).start();
     window.addEventListener('hashchange', () => this.sync());
     const route = parse(location.hash);
@@ -69,18 +65,16 @@ export class App {
    * Fill the tab with the screen. It grows from the glass when the glass is
    * on screen, otherwise from the control that was pressed.
    */
-  private enter(from?: DOMRect, then?: (screen: Screen) => void): void {
+  private enter(from?: DOMRect): void {
     const origin = from && !this.page.glassInView() ? from : undefined;
     void this.screenReady.then((screen) => {
-      if (!screen.isActive) {
-        if (parse(location.hash).name !== 'archive') {
-          history.pushState(null, '', ARCHIVE);
-          this.archivePushed = true;
-        }
-        this.updateMeta(parse(location.hash));
-        screen.activate({ origin });
+      if (screen.isActive) return;
+      if (parse(location.hash).name !== 'archive') {
+        history.pushState(null, '', ARCHIVE);
+        this.archivePushed = true;
       }
-      then?.(screen);
+      this.updateMeta(parse(location.hash));
+      screen.activate({ origin });
     });
   }
 

@@ -1,17 +1,15 @@
 import { backdropMarkup } from '../backdrop';
 import { BRAND, CREATOR } from '../config';
 import { esc, fromHTML, prefersReducedMotion, qs, qsa } from '../lib/dom';
-import { archiveDate, clock } from '../lib/format';
-import { cart } from '../state/cart';
 import { Gallery } from './gallery';
 
-export type TabId = 'archive' | 'licences' | 'printing' | 'faq';
-
-/** Each callback gets the rectangle of the control that was pressed, for the screen to grow from. */
 export interface PageCallbacks {
-  /** Open the screen on one of its sections. */
-  onTab: (tab: TabId, from: DOMRect) => void;
-  onCart: (from: DOMRect) => void;
+  /**
+   * Open the screen. It gets the rectangle of the control that was pressed,
+   * for the screen to grow from. The sections inside the screen open only
+   * from the screen itself.
+   */
+  onEnter: (from: DOMRect) => void;
 }
 
 /** A pointed arch: the brand mark. */
@@ -19,7 +17,8 @@ const MARK = `<svg class="mark" viewBox="0 0 20 24" aria-hidden="true" fill="non
 
 /**
  * Everything outside the screen: the top bar, the hero and the scene behind
- * it, the section that holds the screen, the gallery and the footer.
+ * it, the About panel, the section that holds the screen, the gallery and the
+ * footer.
  */
 export class Page {
   readonly el: HTMLElement;
@@ -27,20 +26,14 @@ export class Page {
   readonly glass: HTMLElement;
   /** The element the corridor scene behind the hero draws into. */
   readonly backdrop: HTMLElement;
-  private archive: HTMLElement;
-  private clockTimer = 0;
 
   constructor(cb: PageCallbacks) {
     this.el = fromHTML(this.template());
     this.glass = qs(this.el, '.crt');
     this.backdrop = qs(this.el, '.backdrop');
-    this.archive = qs(this.el, '#archive');
-    this.archive.after(new Gallery().el);
+    qs(this.el, '#archive').after(new Gallery().el);
 
-    const rect = (el: HTMLElement) => el.getBoundingClientRect();
-    qsa(this.el, '[data-tab]').forEach((btn) => btn.addEventListener('click', () => cb.onTab(btn.dataset.tab as TabId, rect(btn))));
-    qsa(this.el, '[data-cart]').forEach((btn) => btn.addEventListener('click', () => cb.onCart(rect(btn))));
-    qs(this.el, '.hero__scroll').addEventListener('click', () => this.scrollToArchive());
+    qsa(this.el, '[data-enter]').forEach((btn) => btn.addEventListener('click', () => cb.onEnter(btn.getBoundingClientRect())));
     qsa(this.el, '[data-scroll]').forEach((btn) =>
       btn.addEventListener('click', () =>
         this.el.querySelector(`#${btn.dataset.scroll}`)?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' }),
@@ -50,19 +43,6 @@ export class Page {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
     });
-
-    cart.subscribe(() => this.syncCart());
-    this.syncCart();
-  }
-
-  start(): void {
-    this.tick();
-    window.clearInterval(this.clockTimer);
-    this.clockTimer = window.setInterval(() => this.tick(), 1000);
-  }
-
-  scrollToArchive(): void {
-    this.archive.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
   }
 
   /** True when at least half of the standby glass is on screen. */
@@ -70,19 +50,6 @@ export class Page {
     const r = this.glass.getBoundingClientRect();
     const visible = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
     return r.height > 0 && visible >= r.height * 0.5;
-  }
-
-  private tick(): void {
-    const now = new Date();
-    qs(this.el, '.bar__date').textContent = archiveDate(now);
-    qs(this.el, '.bar__time').textContent = clock(now);
-  }
-
-  private syncCart(): void {
-    const n = cart.count;
-    const btn = qs(this.el, '.bar__req');
-    qs(btn, '.bar__count').textContent = String(n);
-    btn.classList.toggle('has-items', n > 0);
   }
 
   /** The painter behind the store. Fields left empty in CREATOR are left out. */
@@ -106,30 +73,25 @@ export class Page {
   <header class="bar">
     <a class="bar__brand" href="#top">${MARK}<span>${BRAND.name}</span></a>
     <nav class="bar__nav" aria-label="Sections">
-      <button type="button" data-tab="archive">Archive</button>
+      <button type="button" data-enter>Archive</button>
       <button type="button" data-scroll="gallery">Gallery</button>
-      <button type="button" data-tab="licences">Licences</button>
-      <button type="button" data-tab="printing">Printing</button>
-      <button type="button" data-tab="faq">FAQ</button>
     </nav>
-    <button type="button" class="bar__req" data-cart>Requisition <span class="bar__count">0</span></button>
-    <span class="bar__clock" aria-hidden="true"><span class="bar__date"></span><span class="bar__time"></span></span>
   </header>
 
   <main>
     <section class="hero" id="top">
       <div class="hero__copy">
         <h1 class="hero__title">${BRAND.name}</h1>
-        <p class="hero__lede">Print-ready models for tabletop wargames. Every pattern is test-printed on resin and FDM before release, and you choose a personal or a merchant licence when you buy.</p>
+        <p class="hero__lede">Print-ready STL models for tabletop wargames, each one test-printed on resin and FDM.</p>
         <div class="hero__actions">
-          <button type="button" class="btn btn--primary" data-tab="archive">Enter the archive <span aria-hidden="true">→</span></button>
-          <button type="button" class="btn" data-tab="licences">Licences</button>
-          <button type="button" class="btn" data-tab="printing">Printing</button>
+          <button type="button" class="btn btn--primary" data-enter>Enter the archive <span aria-hidden="true">→</span></button>
         </div>
-        ${this.about()}
       </div>
       <div class="hero__stage" aria-hidden="true"></div>
-      <button type="button" class="hero__scroll"><span>Scroll</span><i aria-hidden="true"></i></button>
+      <button type="button" class="hero__scroll" data-scroll="about"><span>Scroll</span><i aria-hidden="true"></i></button>
+    </section>
+
+    <section class="about-sec" id="about">${this.about()}
     </section>
 
     <section class="archive" id="archive" aria-label="Pattern archive">

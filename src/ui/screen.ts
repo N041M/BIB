@@ -7,7 +7,6 @@ import { SharedRenderer } from '../three/renderer';
 import { afterglow, clearScripted, degauss, play, powerOff, powerOn, rasterDraw, Telemetry, WAVE_FILTER } from './boot';
 import { CartDrawer } from './cart';
 import { Inspector } from './inspector';
-import type { TabId } from './page';
 import { Store, TABS } from './store';
 
 export interface ScreenCallbacks {
@@ -47,7 +46,6 @@ export class Screen {
   private seq?: Sequence;
   /** Bumped on every activation and exit, so a superseded run stops where it is. */
   private gen = 0;
-  private queued: Array<() => void> = [];
   /** A pattern asked for before the screen was on. It opens once the boot ends. */
   private pendingInspect?: Product;
   private returnFocus: HTMLElement | null = null;
@@ -134,7 +132,6 @@ ${WAVE_FILTER}`;
     this.seq?.skip();
     this.seq = undefined;
     this.telemetry.stop();
-    this.queued = [];
     this.pendingInspect = undefined;
     this.cart.close();
     if (this.inspector.isOpen) {
@@ -181,19 +178,6 @@ ${WAVE_FILTER}`;
     this.returnFocus = null;
   }
 
-  showTab(tab: TabId): void {
-    if (this.inspector.isOpen) this.cb.onCloseInspector();
-    this.cart.close();
-    this.store.setTab(tab, this.state === 'on');
-  }
-
-  openCart(): void {
-    this.whenOn(() => {
-      if (this.inspector.isOpen) this.cb.onCloseInspector();
-      this.cart.open();
-    });
-  }
-
   openInspector(product: Product): void {
     if (this.state !== 'on') {
       this.pendingInspect = product;
@@ -210,11 +194,6 @@ ${WAVE_FILTER}`;
     if (!this.inspector.isOpen) return;
     this.inspector.close();
     this.store.setRenderingPaused(false);
-  }
-
-  private whenOn(fn: () => void): void {
-    if (this.state === 'on') fn();
-    else this.queued.push(fn);
   }
 
   private async run({ origin, instant, quick }: ActivateOptions): Promise<void> {
@@ -289,9 +268,6 @@ ${WAVE_FILTER}`;
     this.store.activate();
     this.announce('Archive ready');
     qs<HTMLElement>(this.store.el, '.tui__tab[aria-selected="true"]').focus({ preventScroll: true });
-    const queued = this.queued;
-    this.queued = [];
-    queued.forEach((fn) => fn());
     const product = this.pendingInspect;
     this.pendingInspect = undefined;
     if (product) this.openInspector(product);

@@ -44,7 +44,8 @@
 @media (max-width: 960px) {
   .backdrop::after {
     background:
-      linear-gradient(180deg, rgb(var(--bg-rgb) / 0.86) 0%, rgb(var(--bg-rgb) / 0.66) 45%, rgb(var(--bg-rgb) / 0.2) 70%, rgb(var(--bg-rgb) / 0.4) 85%, var(--bg) 100%);
+      linear-gradient(180deg, rgb(var(--bg-rgb) / 0.55) 0%, rgb(var(--bg-rgb) / 0) 28%),
+      linear-gradient(0deg, var(--bg) 0, rgb(var(--bg-rgb) / 0.9) 90px, rgb(var(--bg-rgb) / 0.8) 300px, rgb(var(--bg-rgb) / 0.12) 440px);
   }
 }
 
@@ -58,6 +59,7 @@ html.is-terminal {
 .backdrop,
 .bar,
 .hero,
+.about-sec,
 .gallery,
 .foot {
   transition:
@@ -68,6 +70,7 @@ html.is-terminal {
 html.is-dimmed .backdrop,
 html.is-dimmed .bar,
 html.is-dimmed .hero,
+html.is-dimmed .about-sec,
 html.is-dimmed .gallery,
 html.is-dimmed .foot {
   opacity: 0;
@@ -118,8 +121,7 @@ html.is-dimmed .foot {
   margin-left: auto;
 }
 
-.bar__nav button,
-.bar__req {
+.bar__nav button {
   background: none;
   border: 0;
   padding: 9px 10px;
@@ -130,64 +132,20 @@ html.is-dimmed .foot {
   transition: color 0.2s ease;
 }
 
-.bar__nav button:hover,
-.bar__req:hover {
+.bar__nav button:hover {
   color: var(--ink);
 }
 
-.bar__req {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-left: 1px solid var(--line);
-  padding-left: clamp(12px, 2vw, 24px);
-}
-
-.bar__count {
-  min-width: 22px;
-  padding: 3px 5px;
-  border: 1px solid var(--line-2);
-  text-align: center;
-  color: var(--muted);
-}
-
-.bar__req.has-items .bar__count {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
-.bar__clock {
-  display: flex;
-  gap: 12px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.bar__time {
-  color: var(--ink-2);
-  min-width: 8ch;
-}
-
-@media (max-width: 1080px) {
-  .bar__date {
-    display: none;
-  }
-}
-
-@media (max-width: 860px) {
-  .bar__nav {
-    display: none;
-  }
-  .bar__req {
-    margin-left: auto;
-    border-left: 0;
-  }
-}
-
 @media (max-width: 480px) {
-  .bar__clock {
+  .bar__nav button {
+    padding: 9px 6px;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* too narrow for the name and the links side by side */
+@media (max-width: 359px) {
+  .bar__nav {
     display: none;
   }
 }
@@ -206,6 +164,11 @@ html.is-dimmed .foot {
   align-items: center;
 }
 
+/* the title and buttons sit low in the first screen, just above the scroll hint */
+.hero__copy {
+  align-self: end;
+}
+
 /* kept empty so the servitor in the scene behind the hero shows through */
 .hero__stage {
   align-self: stretch;
@@ -222,8 +185,8 @@ html.is-dimmed .foot {
 }
 
 .hero__lede {
-  margin: 22px 0 0;
-  max-width: 48ch;
+  margin: 18px 0 0;
+  max-width: 42ch;
   font-size: 16.5px;
   line-height: 1.65;
   color: var(--ink-2);
@@ -232,21 +195,21 @@ html.is-dimmed .foot {
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 30px;
+  gap: 8px;
+  margin-top: 26px;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  height: 44px;
-  padding: 0 18px;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
   border: 1px solid var(--line-2);
   background: transparent;
   cursor: pointer;
-  font: 12.5px/1 var(--font-mono);
-  letter-spacing: 0.14em;
+  font: 12px/1 var(--font-mono);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
   transition:
@@ -292,11 +255,18 @@ html.is-dimmed .foot {
   transform: translateX(3px);
 }
 
-/* the About panel under the buttons */
+/* ───────────────── About ───────────────── */
+
+.about-sec {
+  max-width: calc(var(--max) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: clamp(64px, 10vh, 112px) var(--gutter) clamp(48px, 8vh, 96px);
+  scroll-margin-top: var(--bar-h);
+}
+
 .about {
   position: relative;
-  max-width: 540px;
-  margin-top: 44px;
+  max-width: 640px;
   border: 1px solid var(--line-2);
   background: linear-gradient(180deg, var(--surface), var(--bg-2));
 }
@@ -445,7 +415,7 @@ html.is-dimmed .foot {
 @media (max-width: 960px) {
   .hero {
     grid-template-columns: minmax(0, 1fr);
-    align-items: start;
+    padding-bottom: 88px;
   }
   .hero__stage {
     display: none;

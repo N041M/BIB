@@ -6,7 +6,7 @@ import type { Sequence } from '../lib/sequence';
 import { cart } from '../state/cart';
 import type { SharedRenderer } from '../three/renderer';
 import { ProductCard } from './card';
-import type { TabId } from './page';
+export type TabId = 'archive' | 'licences' | 'printing' | 'faq';
 
 export const TABS: { id: TabId; label: string }[] = [
   { id: 'archive', label: 'ARCHIVE' },
@@ -136,8 +136,9 @@ export class Store {
     });
   }
 
-  /** Back to the pre-boot state so the next power-on streams everything in again. */
+  /** Back to the pre-boot state so the next power-on opens on the archive and streams everything in again. */
   reset(): void {
+    this.setTab('archive');
     this.cards.forEach((c) => c.reset());
     this.scroller.scrollTop = 0;
   }
