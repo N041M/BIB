@@ -49,11 +49,22 @@ fine scratches.
   out of its tile into a viewer and shrinks back into it on close. Arrow keys
   step through the photos and Esc closes the viewer.
   Put the photos in `public/gallery/` and list them in `src/data/gallery.ts`.
+- **Blog** (`#/blog`, `#/blog/<slug>`). Posts are printed onto a parchment
+  scroll in a three.js scene, with two rolls on brass finials, a print head
+  with lit windows, a candle on an iron stand and a wax seal. Scrolling feeds
+  the paper between the rolls, and lines are struck as they pass the head.
+  The type on the sheet is the page's own text, drawn over it in the same
+  place, so it can be selected, searched and read by screen readers. Posts
+  are in `src/data/posts.ts`. A post can show a photo pasted onto the sheet
+  as a colour print (`style: 'plate'`), a photo printed in ink as a halftone
+  (the default), or a pattern from the archive printed as a shaded drawing of
+  its STL (a `drawing` block). A servo skull hovers over the top right of
+  the scroll and holds a placard that leads back to the main page.
 - **Licences.** Personal or Merchant per model, with a requisition drawer
   (stored in `localStorage`) and a simulated checkout. No payment is taken.
-- **Routing.** `#/` is the page, `#/archive` the screen, and
-  `#/archive/<slug>` a deep link to a model. Back and Forward work as
-  expected.
+- **Routing.** `#/` is the page, `#/archive` the screen,
+  `#/archive/<slug>` a deep link to a model, and `#/blog` the blog. Back and
+  Forward work as expected.
 - **Accessibility.** Real buttons and dialogs, focus trapping, Esc to close,
   and `prefers-reduced-motion` support (no flicker, a plain cut to the store).
 
@@ -159,10 +170,11 @@ breaking.
 
 ```
 src/
-  app.ts               routing between the page and the screen
+  app.ts               routing between the page, the screen and the blog
   config.ts            brand, currency, licences
   data/catalog.ts      products
   data/gallery.ts      gallery photos
+  data/posts.ts        blog posts
   state/cart.ts        cart store (localStorage)
   lib/                 DOM helpers, cancellable timeline, text scramble
   backdrop/
@@ -172,6 +184,15 @@ src/
     scene.ts           the hall, the servitor, the censer, the candles and the camera
     studio/            development only: renders the images (/?render-backdrop)
     shaders/           GLSL for the studio and the overlay
+  press/               the blog's machine in three.js
+    index.ts           renderer, lights, the camera that keeps the sheet under the page's text, opening and closing
+    machine.ts         the rolls, finials, iron straps and print head, built round the sheet
+    paper.ts           the parchment, the sheet and the rolls' paper, and how the type is printed onto it
+    candle.ts, seal.ts the candle on its stand, and the wax seal with its strips
+    skull.ts           the servo skull and its placard
+    plates.ts          colour photos pasted onto the sheet
+    drawing.ts         patterns drawn from their STL for the printer
+    materials.ts       brass, iron and wax, with their detail worked out in the shaders
   three/
     models.ts          STL loading, normalising, caching
     phosphor.ts        phosphor / x-ray shader
@@ -185,8 +206,15 @@ src/
     store.ts, card.ts  the archive as a terminal program
     inspector.ts       3D inspection over the archive
     cart.ts            requisition drawer and simulated checkout
+    blog.ts            the blog: the list and the posts, printing, and drawing the type for the scene
+    blog-pictures.ts   pictures as the printer prints them, in halftone
 scripts/generate-models.mjs   procedural STL generator
+scripts/build-skull.mjs       reduces the servo skull's model into public/blog/skull.bin
 ```
 
 The design is only lightly inspired by Warhammer 40,000. Everything here is
-original, and none of it is affiliated with or endorsed by Games Workshop.
+original except the bone of the servo skull on the blog, which is the "Skull"
+model by Vladimir Petkovic, released under CC0 1.0 in Khronos's
+[glTF sample assets](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ScatteringSkull).
+`node scripts/build-skull.mjs path/to/ScatteringSkull.glb` builds the site's
+copy from it. None of this is affiliated with or endorsed by Games Workshop.

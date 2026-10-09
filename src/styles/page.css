@@ -121,23 +121,27 @@ html.is-dimmed .foot {
   margin-left: auto;
 }
 
-.bar__nav button {
+.bar__nav button,
+.bar__nav a {
   background: none;
   border: 0;
   padding: 9px 10px;
   cursor: pointer;
   letter-spacing: inherit;
   text-transform: inherit;
+  text-decoration: none;
   color: var(--ink-2);
   transition: color 0.2s ease;
 }
 
-.bar__nav button:hover {
+.bar__nav button:hover,
+.bar__nav a:hover {
   color: var(--ink);
 }
 
 @media (max-width: 480px) {
-  .bar__nav button {
+  .bar__nav button,
+  .bar__nav a {
     padding: 9px 6px;
     letter-spacing: 0.08em;
   }

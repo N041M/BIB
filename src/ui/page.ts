@@ -12,6 +12,15 @@ export interface PageCallbacks {
   onEnter: (from: DOMRect) => void;
 }
 
+/**
+ * The page's own links close the blog first. The scroll lock comes off at
+ * once, so the scroll that follows can run while the blog is still closing.
+ */
+function leaveBlog(): void {
+  if (location.hash.startsWith('#/blog')) location.hash = '#/';
+  document.documentElement.classList.remove('is-blog');
+}
+
 /** A pointed arch: the brand mark. */
 const MARK = `<svg class="mark" viewBox="0 0 20 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 23V11.5C3 6.8 6 3.3 10 1.5c4 1.8 7 5.3 7 10V23"/><path d="M7 23V12.5c0-2.6 1.2-4.6 3-5.8 1.8 1.2 3 3.2 3 5.8V23" opacity=".55"/><path d="M0 23h20"/></svg>`;
 
@@ -35,12 +44,14 @@ export class Page {
 
     qsa(this.el, '[data-enter]').forEach((btn) => btn.addEventListener('click', () => cb.onEnter(btn.getBoundingClientRect())));
     qsa(this.el, '[data-scroll]').forEach((btn) =>
-      btn.addEventListener('click', () =>
-        this.el.querySelector(`#${btn.dataset.scroll}`)?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' }),
-      ),
+      btn.addEventListener('click', () => {
+        leaveBlog();
+        this.el.querySelector(`#${btn.dataset.scroll}`)?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      }),
     );
     qs(this.el, '.bar__brand').addEventListener('click', (e) => {
       e.preventDefault();
+      leaveBlog();
       window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
     });
   }
@@ -75,6 +86,7 @@ export class Page {
     <nav class="bar__nav" aria-label="Sections">
       <button type="button" data-enter>Archive</button>
       <button type="button" data-scroll="gallery">Gallery</button>
+      <a href="#/blog">Blog</a>
     </nav>
   </header>
 

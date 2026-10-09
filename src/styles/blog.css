@@ -1,0 +1,338 @@
+/* ───────────────── Blog: paper between two rolls ───────────────── */
+
+/* the page underneath fades out and stops scrolling, like it does for the archive screen */
+html.is-blog {
+  overflow: hidden;
+}
+
+html.is-blog .backdrop,
+html.is-blog .hero,
+html.is-blog .about-sec,
+html.is-blog .gallery,
+html.is-blog .foot {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+html.is-blog .bar__nav [href='#/blog'] {
+  color: var(--ink);
+}
+
+/*
+ * The machine is drawn by src/press into the canvas in .blog__view. The page
+ * only reserves the sheet's place: .blog__frame is measured, and the type in
+ * .sheet is laid out over it.
+ */
+.blog {
+  --type: rgb(14 10 8 / 0.97);
+  --type-dim: rgb(60 47 36 / 0.94);
+  --type-red: rgb(204 42 24 / 0.97);
+  /* the machine sits between these, and the paper is this wide */
+  /* room above the top roll for the servo skull and its placard */
+  --frame-top: calc(var(--bar-h) + 116px);
+  --frame-bottom: 8px;
+  --paper-w: min(720px, calc(100vw - 2 * var(--gutter) - 184px));
+  /* radius of the rolls, matching fittings() in src/ui/blog.ts */
+  --r: clamp(24px, 4vh, 38px);
+
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: var(--bg);
+  opacity: 0;
+  transition: opacity 0.45s ease 0.95s;
+  /* laid out but not drawn while closed, so the machine can be built ahead of opening */
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.blog.is-shown {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.blog.is-open {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.blog.is-instant,
+.blog.is-instant * {
+  transition: none !important;
+  animation: none !important;
+}
+
+.blog__view,
+.blog__view canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.blog__frame {
+  position: absolute;
+  left: 50%;
+  top: var(--frame-top);
+  bottom: var(--frame-bottom);
+  width: var(--paper-w);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.blog__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  /* the script keeps the paper's place itself while blank paper is added and taken away */
+  overflow-anchor: none;
+  scrollbar-width: none;
+  outline: none;
+}
+
+.blog__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* the way back to the main page: the scene draws a servo skull holding a placard here, and this link takes its clicks */
+.blog__back {
+  position: absolute;
+  z-index: 1;
+  color: transparent;
+  text-decoration: none;
+  font-size: 0;
+  border-radius: 8px;
+}
+
+.blog__back:focus-visible {
+  outline: 1px dashed rgb(232 225 217 / 0.6);
+  outline-offset: 2px;
+}
+
+/* ── the type: transparent here, and printed onto the sheet by the scene ── */
+
+/* the text in a book face, and titles, dates and labels in capitals cut like an inscription */
+.sheet {
+  --lh: 30px;
+  position: relative;
+  width: var(--paper-w);
+  margin: 0 auto;
+  padding: calc(var(--frame-top) + var(--r) * 2 + 26px + var(--lead, 0px)) clamp(18px, calc(var(--paper-w) * 0.075), 56px) calc(46svh + var(--frame-bottom));
+  font: 500 20px / var(--lh) 'EB Garamond', Georgia, serif;
+  color: transparent;
+}
+
+.sheet .blk {
+  display: block;
+  margin: 0 0 calc(var(--lh) * 0.8);
+  padding: 0;
+  font: inherit;
+  list-style: none;
+}
+
+.sheet .blk--head {
+  margin-top: calc(var(--lh) * 1.2);
+}
+
+.sheet .blk--end {
+  margin-top: calc(var(--lh) * 1.4);
+}
+
+.sheet h1,
+.sheet h2 {
+  margin: 0;
+  font: inherit;
+}
+
+.sheet li,
+.sheet figcaption {
+  display: block;
+}
+
+.ln {
+  display: block;
+  height: var(--lh);
+  white-space: pre;
+  color: transparent;
+  text-decoration: none;
+}
+
+.ln--meta {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 14px;
+}
+
+.ln--caption {
+  font-style: italic;
+  font-size: 17.5px;
+}
+
+.ln__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ln--strong {
+  height: 36px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 36px;
+}
+
+.ln--title {
+  height: 52px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 52px;
+}
+
+.ln--rule {
+  height: 18px;
+}
+
+.ln--spread {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ln--center {
+  text-align: center;
+}
+
+/* a post in the list: the scene prints a frame round its box */
+.sheet .entry {
+  display: block;
+  margin-bottom: 26px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ln--more {
+  margin-top: 4px;
+}
+
+/* the scene draws the focus ring on the sheet */
+.entry:focus-visible,
+.ln--link:focus-visible {
+  outline: none;
+}
+
+.photo {
+  margin: 6px 0 10px;
+}
+
+/* strips step 5px but are 6px tall, so the overlap hides seams at fractional zoom levels */
+.strip {
+  display: block;
+  height: 6px;
+  margin-bottom: -1px;
+}
+
+.sheet ::selection {
+  background: rgb(163 41 29 / 0.28);
+  color: transparent;
+}
+
+/* ── without WebGL: the type on a plain sheet ── */
+
+.blog.is-flat .blog__back {
+  left: max(16px, calc(50% - var(--paper-w) / 2)) !important;
+  top: calc(var(--bar-h) + 24px) !important;
+  width: auto !important;
+  height: auto !important;
+  color: var(--ink-2);
+  font: 600 14px 'Cinzel', Georgia, serif;
+}
+
+.blog.is-flat .blog__frame {
+  background: #c4a87c;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.7);
+}
+
+.blog.is-flat .ln.is-inked {
+  color: var(--type);
+}
+
+.blog.is-flat .ln--meta.is-inked,
+.blog.is-flat .ln--caption.is-inked {
+  color: var(--type-dim);
+}
+
+.blog.is-flat .ln--title.is-inked,
+.blog.is-flat .entry:hover .ln--strong.is-inked,
+.blog.is-flat .ln--link.is-inked:hover {
+  color: var(--type-red);
+}
+
+.blog.is-flat .ln--rule.is-inked {
+  height: 5px;
+  margin: 6px 0 7px;
+  border-block: 1px solid var(--type-dim);
+}
+
+.blog.is-flat .entry {
+  outline: 1px solid var(--type-dim);
+}
+
+.blog.is-flat .ln--more.is-inked,
+.blog.is-flat .is-inked .ln__link {
+  color: var(--type-red);
+}
+
+.blog.is-flat .is-inked .ln__link {
+  text-decoration: underline;
+}
+
+.blog.is-flat .entry:focus-visible,
+.blog.is-flat .ln--link:focus-visible {
+  outline: 1px dashed var(--type);
+  outline-offset: 4px;
+}
+
+.blog.is-flat .photo {
+  background: var(--src) center / cover;
+  filter: sepia(0.3) saturate(0.85);
+}
+
+.blog.is-flat .sheet ::selection {
+  color: inherit;
+}
+
+/* narrow screens: a smaller machine and type, and no candle */
+@media (max-width: 600px) {
+  .blog {
+    --paper-w: calc(100vw - 48px);
+    --frame-top: calc(var(--bar-h) + 86px);
+  }
+
+  .sheet {
+    --lh: 26px;
+    font-size: 17px;
+  }
+
+  .ln--meta {
+    font-size: 12.5px;
+  }
+
+  .ln--caption {
+    font-size: 15px;
+  }
+
+  .ln--strong {
+    height: 29px;
+    font-size: 18.5px;
+    line-height: 29px;
+  }
+
+  .ln--title {
+    height: 40px;
+    font-size: 27px;
+    line-height: 40px;
+  }
+}

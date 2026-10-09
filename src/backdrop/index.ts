@@ -41,7 +41,7 @@ export class Backdrop {
   private poster?: Poster;
   private raf = 0;
   private onScreen = true;
-  private dimmed = document.documentElement.classList.contains('is-dimmed');
+  private dimmed = coveredPage();
   private t0 = 0;
   /** Which of GAPS the overlay draws at. */
   private pace = 0;
@@ -69,7 +69,7 @@ export class Backdrop {
       this.wake();
     }).observe(this.host);
     new MutationObserver(() => {
-      this.dimmed = document.documentElement.classList.contains('is-dimmed');
+      this.dimmed = coveredPage();
       this.wake();
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     // a turned phone or a resized window can switch to the other image, which needs a new overlay
@@ -170,6 +170,12 @@ export class Backdrop {
     // let the image fade back in before the canvas goes
     if (canvas) window.setTimeout(() => canvas.remove(), 700);
   }
+}
+
+/** True while the archive screen or the blog covers the page. */
+function coveredPage(): boolean {
+  const cl = document.documentElement.classList;
+  return cl.contains('is-dimmed') || cl.contains('is-blog');
 }
 
 /** The accent and the page background from the active palette. */
