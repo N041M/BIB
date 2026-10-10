@@ -117,7 +117,7 @@ export class LiveRenderer {
       this.linked++;
       if (ORDER[this.linked - 1] === 'volume') bakeVolume(gl, this.program('volume'), this.light, this.vao);
     }
-    const limit = this.parallel ? ORDER.length : this.linked + 1;
+    const limit = this.parallel ? ORDER.length : Math.min(this.linked + 1, ORDER.length);
     for (; this.started < limit; this.started++) {
       const name = ORDER[this.started];
       const [vs, fs, attributes] = this.sources[name];
