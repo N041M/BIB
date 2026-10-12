@@ -159,10 +159,18 @@ breaking.
 
 - `src/config.ts`: brand name, domain, terminal name, currency/locale and
   licence terms.
-- `THEME.phosphor` in `src/config.ts`: `'red'` or `'green'`. It switches the
-  page accent, the screen and the 3D models together, along with the glass of
-  the votive cups and the servitor's optic in the scene behind the hero.
-- `src/styles/base.css`: both palettes, as CSS variables (`--p-*` is the
+- `THEME` in `src/config.ts` picks the colours for each part of the site:
+  - `screen`: `'red'` or `'green'`. The archive screen and its 3D models.
+  - `page`: `'candle'`, `'red'` or `'green'`. The page around the screen.
+    `'candle'` is bone and warm black with a candle-gold accent.
+  - `scene`: `'red'` or `'green'`. The glass of the votive cups and the
+    servitor's optic behind the hero, and the print head's windows on the
+    blog.
+
+  The hero images are rendered with the page background and the scene's
+  glass, so render them again after changing `page` or `scene` (see
+  [The scene behind the hero](#the-scene-behind-the-hero)).
+- `src/styles/base.css`: the palettes, as CSS variables (`--p-*` is the
   phosphor ramp on the screen).
 - `src/three/phosphor.ts`: the model shader. It reads its colours from the same CSS variables.
 

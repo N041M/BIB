@@ -159,12 +159,12 @@ export class Press {
     this.scene.environment = hallEnvironment(renderer);
     this.scene.environmentIntensity = 0.55;
 
-    const phosphor = getComputedStyle(document.documentElement).getPropertyValue('--p').trim() || '#ff5a43';
+    const glass = getComputedStyle(document.documentElement).getPropertyValue('--scene-glass').trim() || '#ff5a43';
     this.mats = {
       brass: brass(0.12),
       rubbed: brass(0.8),
       iron: iron(),
-      glass: headGlass(new THREE.Color(phosphor)),
+      glass: headGlass(new THREE.Color(glass)),
       sheet: sheetMaterial(this.paper),
       roll: rollMaterial(this.paper),
     };
@@ -175,7 +175,7 @@ export class Press {
     this.key.shadow.bias = -0.0004;
     this.key.shadow.camera.near = 200;
     this.key.shadow.camera.far = 8000;
-    this.glow.color.set(phosphor);
+    this.glow.color.set(glass);
     this.rig.add(this.lamp, this.glow, this.plates.group);
     this.scene.add(this.rig, this.key, this.key.target, this.daylight);
 

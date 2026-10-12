@@ -1,11 +1,12 @@
 /*
- * Two palettes, picked with THEME.phosphor in src/config.ts. Each one sets the
- * page around the screen (black glass and bone, with the phosphor as the one
- * accent) and the phosphor ramp on the screen, from overexposed to barely lit.
- * The 3D models read the same variables.
+ * The palettes, picked in THEME in src/config.ts. `page` sets the page around
+ * the screen: black glass and bone, with one accent. `screen` sets the
+ * phosphor ramp on the screen, from overexposed to barely lit, and the 3D
+ * models read it too. `scene` sets the coloured glass in the hero scene and
+ * on the blog's machine.
  */
 :root {
-  /* red */
+  /* page: candle */
   --bg: #090606;
   --bg-rgb: 9 6 6;
   --bg-2: #0c0807;
@@ -15,10 +16,11 @@
   --ink: #e8e1d9;
   --ink-2: #b1a79e;
   --muted: #7b6f68;
-  --accent: #ff5a43;
-  --accent-hi: #ff9a87;
-  --accent-ink: #160403;
+  --accent: #d9ab5f;
+  --accent-hi: #ecca8e;
+  --accent-ink: #160e04;
 
+  /* screen: red */
   --p-rgb: 255 90 67;
   --p-hot: #fff1ec;
   --p-hi: #ffd6ca;
@@ -32,9 +34,18 @@
   --glass-1: #150a09;
   --glass-2: #0c0606;
   --glass-3: #050202;
+
+  /* scene: red */
+  --scene-glass: #ff5a43;
 }
 
-:root[data-phosphor='green'] {
+:root[data-page='red'] {
+  --accent: #ff5a43;
+  --accent-hi: #ff9a87;
+  --accent-ink: #160403;
+}
+
+:root[data-page='green'] {
   --bg: #070908;
   --bg-rgb: 7 9 8;
   --bg-2: #0a0d0b;
@@ -47,7 +58,9 @@
   --accent: #8ee68a;
   --accent-hi: #b9f3b3;
   --accent-ink: #051007;
+}
 
+:root[data-screen='green'] {
   --p-rgb: 142 230 138;
   --p-hot: #f0ffec;
   --p-hi: #dcfbd3;
@@ -61,6 +74,10 @@
   --glass-1: #0b120d;
   --glass-2: #070b08;
   --glass-3: #030504;
+}
+
+:root[data-scene='green'] {
+  --scene-glass: #8ee68a;
 }
 
 :root {

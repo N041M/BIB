@@ -5,7 +5,7 @@ layout(location = 0) out vec4 oColor;
 
 uniform float uTime;
 uniform vec4 uFlicker;
-uniform vec3 uAccent;
+uniform vec3 uGlass;
 uniform float uEmber;
 
 const vec3 EMBER = vec3(1.0, 0.32, 0.08);
@@ -75,7 +75,7 @@ void main() {
   if (kind == 2.0) {
     float r2 = dot(q, q);
     float pulse = 0.85 + 0.15 * sin(uTime * 2.3 + seed * 6.0);
-    oColor = vec4(uAccent * (exp(-r2 * 10.0) * 8.0 + exp(-sqrt(r2) * 3.5) * 0.5) * gain * pulse, 0.0);
+    oColor = vec4(uGlass * (exp(-r2 * 10.0) * 8.0 + exp(-sqrt(r2) * 3.5) * 0.5) * gain * pulse, 0.0);
     return;
   }
 

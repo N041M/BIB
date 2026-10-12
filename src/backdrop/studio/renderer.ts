@@ -55,7 +55,7 @@ export class StudioRenderer {
 
   constructor(
     private canvas: HTMLCanvasElement,
-    private colours: { accent: [number, number, number]; bg: [number, number, number] },
+    private colours: { glass: [number, number, number]; bg: [number, number, number] },
   ) {
     const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: true });
     if (!gl) throw new Error('WebGL2 is not available');
@@ -114,7 +114,7 @@ export class StudioRenderer {
     gl.bindFramebuffer(gl.FRAMEBUFFER, t.fb);
     gl.viewport(0, 0, t.w, t.h);
     this.setView(p);
-    gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+    gl.uniform3fv(p.u('uGlass'), this.colours.glass);
     gl.bindVertexArray(this.vao);
     for (let pass = 0; pass < passes; pass++) {
       if (pass > 0) {
@@ -182,7 +182,7 @@ export class StudioRenderer {
       ]);
       gl.uniform1f(p.u('uTime'), time);
       gl.uniform4fv(p.u('uFlicker'), STEADY);
-      gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+      gl.uniform3fv(p.u('uGlass'), this.colours.glass);
       gl.uniform3fv(p.u('uCenser'), censerPosition(time));
       gl.uniform1f(p.u('uEmber'), ember(time));
       gl.enable(gl.BLEND);
@@ -233,7 +233,7 @@ export class StudioRenderer {
     const p = this.programs.maps.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, maps.fb);
     gl.viewport(0, 0, maps.w, maps.h);
-    gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+    gl.uniform3fv(p.u('uGlass'), this.colours.glass);
     bindTextures(gl, p, [
       ['uDay', bake.tex[0]],
       ['uAlbedo', bake.tex[1]],
@@ -272,7 +272,7 @@ export class StudioRenderer {
     gl.uniform1f(p.u('uTime'), time);
     gl.uniform4fv(p.u('uFlicker'), STEADY);
     gl.uniform1f(p.u('uEmber'), ember(time));
-    gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+    gl.uniform3fv(p.u('uGlass'), this.colours.glass);
   }
 }
 

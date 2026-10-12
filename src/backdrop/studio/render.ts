@@ -33,7 +33,7 @@ export async function renderBackdrop(): Promise<void> {
 
   const canvas = document.createElement('canvas');
   const style = getComputedStyle(document.documentElement);
-  const studio = new StudioRenderer(canvas, { accent: toLinear(hex(style.getPropertyValue('--accent'))), bg: hex(style.getPropertyValue('--bg')) });
+  const studio = new StudioRenderer(canvas, { glass: toLinear(hex(style.getPropertyValue('--scene-glass'))), bg: hex(style.getPropertyValue('--bg')) });
 
   for (const poster of [WIDE, TALL]) {
     const [full, ...smaller] = poster.widths;

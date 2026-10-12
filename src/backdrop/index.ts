@@ -178,10 +178,10 @@ function coveredPage(): boolean {
   return cl.contains('is-dimmed') || cl.contains('is-blog');
 }
 
-/** The accent and the page background from the active palette. */
+/** The colour of the scene's glass and the page background, from the active palettes. */
 function readColours(): Colours {
   const style = getComputedStyle(document.documentElement);
-  return { accent: toLinear(rgb(style.getPropertyValue('--accent'))), bg: rgb(style.getPropertyValue('--bg')) };
+  return { glass: toLinear(rgb(style.getPropertyValue('--scene-glass'))), bg: rgb(style.getPropertyValue('--bg')) };
 }
 
 function rgb(hex: string): [number, number, number] {

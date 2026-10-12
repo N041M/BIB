@@ -30,8 +30,19 @@ export const CREATOR = {
   url: 'https://www.twitch.tv/rude_raccoon',
 };
 
-/** Which phosphor the screen and the page accent use. Both palettes are in src/styles/base.css. */
-export const THEME: { phosphor: 'red' | 'green' } = { phosphor: 'green' };
+/**
+ * Colours for each part of the site. The palettes are in src/styles/base.css.
+ * The hero images are rendered with the `page` background and the `scene`
+ * glass, so render them again after changing either (see the README).
+ */
+export const THEME: {
+  /** The archive screen and its 3D models. */
+  screen: 'red' | 'green';
+  /** The page around the screen. `candle` is bone and warm black with a candle-gold accent. */
+  page: 'candle' | 'red' | 'green';
+  /** The votive cups and the servitor's optic behind the hero, and the print head's windows on the blog. */
+  scene: 'red' | 'green';
+} = { screen: 'green', page: 'candle', scene: 'red' };
 
 export type LicenceId = 'personal' | 'merchant';
 

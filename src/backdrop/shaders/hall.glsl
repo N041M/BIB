@@ -239,7 +239,7 @@ vec2 ashlar(vec2 uv, vec2 size) {
   return vec2(hash12(vec2(floor(u), row)), joint);
 }
 
-uniform vec3 uAccent;
+uniform vec3 uGlass;
 
 Surf surface(vec3 p, inout vec3 n, float id) {
   Surf s = Surf(vec3(0.2), 0.8, 0.0, vec3(0.0), 0.0, 0.0, 0.0, 0.0);
@@ -249,7 +249,7 @@ Surf surface(vec3 p, inout vec3 n, float id) {
     vec4 b = CANDLE_Q[i];
     s.group = b.z;
     if (b.y > 2.5) {
-      s.alb = uAccent * 0.95;
+      s.alb = uGlass * 0.95;
       s.rough = 0.12;
       s.glow = b.w * 1.6 * (0.6 + 0.4 * smoothstep(0.0, b.x, p.y - a.y));
       return s;

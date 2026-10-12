@@ -131,7 +131,7 @@ Surf servitorSurface(vec3 p, inout vec3 n, float id) {
     s.rough = 0.3;
   } else if (id == M_LENS) {
     s.alb = vec3(0.0);
-    s.emit = uAccent * 6.0;
+    s.emit = uGlass * 6.0;
   } else if (id == M_CABLE) {
     s.alb = vec3(0.025);
     s.rough = 0.5;

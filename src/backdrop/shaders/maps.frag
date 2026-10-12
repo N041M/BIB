@@ -13,10 +13,10 @@ uniform sampler2D uCandleD;
 uniform sampler2D uCandleS;
 uniform sampler2D uAir;
 uniform sampler2D uHdr;
-uniform vec3 uAccent;
+uniform vec3 uGlass;
 
 const vec3 CANDLE_COL = vec3(1.0, 0.5, 0.19);
-#define VOTIVE_COL mix(CANDLE_COL, uAccent, 0.55)
+#define VOTIVE_COL mix(CANDLE_COL, uGlass, 0.55)
 
 float lum(vec3 c) {
   return dot(c, vec3(0.2126, 0.7152, 0.0722));

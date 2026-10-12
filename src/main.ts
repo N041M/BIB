@@ -11,7 +11,7 @@ import './styles/overlays.css';
 import { App } from './app';
 import { THEME } from './config';
 
-document.documentElement.dataset.phosphor = THEME.phosphor;
+Object.assign(document.documentElement.dataset, THEME);
 new App(document.getElementById('app')!).start();
 
 // Development only: re-render the backdrop images into public/backdrop/.

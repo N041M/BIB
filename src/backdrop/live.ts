@@ -24,7 +24,7 @@ const ORDER: ProgramName[] = ['volume', 'live', 'sprite', 'finish'];
 const IN_FLIGHT = 3;
 
 export interface Colours {
-  accent: [number, number, number];
+  glass: [number, number, number];
   bg: [number, number, number];
 }
 
@@ -153,7 +153,7 @@ export class LiveRenderer {
     gl.uniform1f(p.u('uTime'), time);
     gl.uniform4fv(p.u('uFlicker'), flick);
     gl.uniform1f(p.u('uEmber'), ember(time));
-    gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+    gl.uniform3fv(p.u('uGlass'), this.colours.glass);
     gl.uniform3fv(p.u('uBg'), this.colours.bg);
     gl.uniform1i(p.u('uFrame'), this.frame++);
     bindTextures(gl, p, [
@@ -170,7 +170,7 @@ export class LiveRenderer {
     bindTextures(gl, p, [['uDepth', depth]]);
     gl.uniform1f(p.u('uTime'), time);
     gl.uniform4fv(p.u('uFlicker'), flick);
-    gl.uniform3fv(p.u('uAccent'), this.colours.accent);
+    gl.uniform3fv(p.u('uGlass'), this.colours.glass);
     gl.uniform3fv(p.u('uCenser'), censerPosition(time));
     gl.uniform1f(p.u('uEmber'), ember(time));
     gl.enable(gl.BLEND);

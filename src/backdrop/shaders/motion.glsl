@@ -6,11 +6,11 @@ uniform highp sampler3D uLight;
 uniform float uTime;
 uniform vec4 uFlicker;
 uniform float uEmber;
-uniform vec3 uAccent;
+uniform vec3 uGlass;
 
 const vec3 CANDLE_COL = vec3(1.0, 0.5, 0.19);
 // candlelight through the coloured glass of the votive cups
-#define VOTIVE_COL mix(CANDLE_COL, uAccent, 0.55)
+#define VOTIVE_COL mix(CANDLE_COL, uGlass, 0.55)
 const vec3 EMBER_COL = vec3(1.0, 0.32, 0.08);
 const float HAZE = 0.016;
 // absorption in the air, so the far end sinks into the dark
