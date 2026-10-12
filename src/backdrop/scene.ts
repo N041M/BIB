@@ -90,7 +90,7 @@ export const enum Kind {
   Ledge = 1,
   /** On top of an iron pricket stand. */
   Stand = 2,
-  /** A tealight in a red glass cup on the votive rack. */
+  /** A tealight in a glass cup on the votive rack, tinted with the phosphor colour. */
   Cup = 3,
 }
 
@@ -206,7 +206,7 @@ const bayZ = (k: number) => HALL.z0 - (k + 0.5) * HALL.bay;
 /** Origin of the votive rack: the middle of its footprint, against the right wall. */
 const RACK = { x: 2.25, z: -4.15 };
 
-// The votive rack beside the servitor: three stepped tiers of red glass cups.
+// The votive rack beside the servitor: three stepped tiers of glass cups in the phosphor colour.
 {
   const cups: Omit<Candle, 'group'>[] = [];
   for (let tier = 0; tier < 3; tier++) {

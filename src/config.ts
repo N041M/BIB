@@ -31,7 +31,7 @@ export const CREATOR = {
 };
 
 /** Which phosphor the screen and the page accent use. Both palettes are in src/styles/base.css. */
-export const THEME: { phosphor: 'red' | 'green' } = { phosphor: 'red' };
+export const THEME: { phosphor: 'red' | 'green' } = { phosphor: 'green' };
 
 export type LicenceId = 'personal' | 'merchant';
 

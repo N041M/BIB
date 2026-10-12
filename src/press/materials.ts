@@ -163,7 +163,7 @@ export function sealWax(): THREE.MeshPhysicalMaterial {
 
 /* ───────────── glass behind the print head's windows ───────────── */
 
-/** The windows in the print head glow red from inside, in the archive's phosphor colour. */
+/** The windows in the print head glow from inside in the archive's phosphor colour. */
 export function headGlass(colour: THREE.Color): THREE.MeshStandardMaterial {
   const mat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.25, metalness: 0, emissive: colour, emissiveIntensity: 1 });
   return detailed(mat, {

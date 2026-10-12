@@ -42,7 +42,7 @@ export interface Machine {
   stand?: THREE.Vector3;
   /** Where the wax seal's cord is tied: under the bearing on the top roll's right end. */
   seal?: THREE.Vector3;
-  /** The middle of the print head's windows, for their red light. */
+  /** The middle of the print head's windows, for their light. */
   head: THREE.Vector3;
   /** Where the sheet's left edge is in a roll's object space. */
   rollLeft: number;
